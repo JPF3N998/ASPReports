@@ -2,7 +2,7 @@ USE ASPReports
 GO
 
 DROP TABLE IF EXISTS Sitios
-CREATE TABLE Sitios(id INT,nombre NVARCHAR(128))
+CREATE TABLE Sitios(id INT,nombre NVARCHAR(128),ubicacion NVARCHAR(512),conveniencia NVARCHAR(512))
 GO
 
 --Identity for TipoRecurso?
