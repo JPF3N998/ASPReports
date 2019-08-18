@@ -5,8 +5,15 @@ DROP TABLE IF EXISTS Sitios
 CREATE TABLE Sitios(id INT,nombre NVARCHAR(128))
 GO
 
+--Identity for TipoRecurso?
 DROP TABLE IF EXISTS TipoRecurso
-CREATE TABLE TipoRecurso(id INT, nombre NVARCHAR(64))
+CREATE TABLE TipoRecurso(id INT IDENTITY(1,1), nombre NVARCHAR(64))
+INSERT INTO TipoRecurso(nombre) VALUES ("Natural")
+INSERT INTO TipoRecurso(nombre) VALUES ("Etnografico")
+INSERT INTO TipoRecurso(nombre) VALUES ("Geologico")
+INSERT INTO TipoRecurso(nombre) VALUES ("De paisaje")
+INSERT INTO TipoRecurso(nombre) VALUES ("Arquitectonico ")
+INSERT INTO TipoRecurso(nombre) VALUES ("Arqueologico")
 GO
 
 DROP TABLE IF EXISTS Recursos
