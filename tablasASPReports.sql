@@ -1,3 +1,14 @@
+--Presione F5 para crear la base de datos junto con las tablas
+
+USE master
+GO
+
+DROP DATABASE IF EXISTS ASPReports
+GO
+
+CREATE DATABASE ASPReports
+GO
+
 USE ASPReports
 GO
 
@@ -22,12 +33,12 @@ CREATE TABLE TipoRecurso(
 	nombre NVARCHAR(128) NOT NULL,
 	fechaCreacion DATE NOT NULL
 )
-INSERT INTO TipoRecurso(nombre) VALUES ("Natural")
-INSERT INTO TipoRecurso(nombre) VALUES ("Etnografico")
-INSERT INTO TipoRecurso(nombre) VALUES ("Geologico")
-INSERT INTO TipoRecurso(nombre) VALUES ("De paisaje")
-INSERT INTO TipoRecurso(nombre) VALUES ("Arquitectonico ")
-INSERT INTO TipoRecurso(nombre) VALUES ("Arqueologico")
+INSERT INTO TipoRecurso(nombre,fechaCreacion) VALUES ('Natural',GETDATE())
+INSERT INTO TipoRecurso(nombre,fechaCreacion) VALUES ('Etnografico',GETDATE())
+INSERT INTO TipoRecurso(nombre,fechaCreacion) VALUES ('Geologico',GETDATE())
+INSERT INTO TipoRecurso(nombre,fechaCreacion) VALUES ('De paisaje',GETDATE())
+INSERT INTO TipoRecurso(nombre,fechaCreacion) VALUES ('Arquitectonico',GETDATE())
+INSERT INTO TipoRecurso(nombre,fechaCreacion) VALUES ('Arqueologico',GETDATE())
 GO
 
 /**
@@ -74,7 +85,7 @@ CREATE TABLE IndicadorUmbrales(
 	optimo NVARCHAR(1024) NOT NULL,
 	aceptable NVARCHAR(1024) NOT NULL,
 	inaceptable NVARCHAR(1024) NOT NULL,
-	acciones NVARCHAR(4096) NOT NULL,
+	acciones NVARCHAR(2048) NOT NULL,
 	fechaModificacion DATE NOT NULL
 )
 GO
