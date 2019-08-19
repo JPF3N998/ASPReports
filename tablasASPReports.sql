@@ -18,7 +18,9 @@ GO
 CREATE TABLE ASP(
 	id INT IDENTITY(1,1) PRIMARY KEY,
 	nombre NVARCHAR(64) NOT NULL,
-	ubicacion NVARCHAR(512) NOT NULL
+	ubicacion NVARCHAR(256) NOT NULL,
+	fechaCreacion NVARCHAR(10) NOT NULL,
+	activo BIT NOT NULL
 )
 GO
 
@@ -26,8 +28,8 @@ DROP TABLE IF EXISTS Sitios
 CREATE TABLE Sitios(
 	id INT IDENTITY(1,1) PRIMARY KEY,
 	idASP INT NOT NULL, 
-	nombre NVARCHAR(128) NOT NULL,
-	ubicacion NVARCHAR(512) NOT NULL,
+	nombre NVARCHAR(64) NOT NULL,
+	ubicacion NVARCHAR(256) NOT NULL,
 	conveniencia NVARCHAR(512) NOT NULL,
 	calidad NVARCHAR(512) NOT NULL,
 	tamano NVARCHAR(512) NOT NULL,
@@ -35,6 +37,7 @@ CREATE TABLE Sitios(
 	observacionesDisenoInfraestructura NVARCHAR(1024),
 	valoracion FLOAT NOT NULL,
 	fechaCreacion NVARCHAR(10) NOT NULL,
+	activo BIT NOT NULL,
 	FOREIGN KEY (idASP) REFERENCES ASP(id)
 )
 GO
@@ -66,7 +69,7 @@ CREATE TABLE Recursos(
 	idTipoRecurso INT NOT NULL,
 	idSitio INT NOT NULL,
 	nombre NVARCHAR(128) NOT NULL,
-
+	activo BIT NOT NULL,
 	FOREIGN KEY (idTipoRecurso) REFERENCES TipoRecurso(id),
 	FOREIGN KEY (idSitio) REFERENCES Sitios(id)
 )
@@ -107,7 +110,7 @@ CREATE TABLE Oportunidades(
 	idRecurso INT NOT NULL,
 	nombre NVARCHAR(256) NOT NULL,
 	fechaCreacion NVARCHAR(10) NOT NULL,
-
+	activo BIT NOT NULL,
 	FOREIGN KEY (idRecurso) REFERENCES Recursos(id)
 )
 GO
@@ -136,19 +139,19 @@ CREATE TABLE Usuario(
 	correo NVARCHAR(50) NOT NULL,
 	usuario NVARCHAR(50) NOT NULL,
 	contrasena NVARCHAR(50) NOT NULL,
-	admin BIT
+	admin BIT NOT NULL,
+	activo BIT NOT NULL
 )
 GO
 
-INSERT INTO Usuario(nombre,cedula,correo,usuario,contrasena,admin) VALUES ('admin','123456789','admin@sinac.co.cr','admin','admin',1)
+INSERT INTO Usuario(nombre,cedula,correo,usuario,contrasena,admin,activo) VALUES ('Administrador','123456789','admin@sinac.co.cr','admin','admin',1,1)
 GO
-
 
 --Notas
 /**
 	+ Antes de borrar un sitio, recurso o oportunidad, pedirle al usuario que ingrese el nombre del sitio,
 	recurso o oportunidad para confirmar el borrado
-
-	+ Manejo de usuarios
+	
+	+ Campo que indica quien fue el ultimo en modificar algun recurso,sitio,etc.
 
 **/

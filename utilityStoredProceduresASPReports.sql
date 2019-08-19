@@ -38,7 +38,6 @@ CREATE PROC spLogin @nombreUsuarioInput NVARCHAR(50), @passwordInput NVARCHAR(50
 	END
 GO
 
-declare @bit bit;
-exec spLogin 'admin','admin', @bit output
-print convert(nvarchar(2),@bit)
-go
+
+
+
