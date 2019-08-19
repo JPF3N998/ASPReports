@@ -31,14 +31,14 @@ DROP TABLE IF EXISTS TipoRecurso
 CREATE TABLE TipoRecurso(
 	id INT IDENTITY(1,1) NOT NULL,
 	nombre NVARCHAR(128) NOT NULL,
-	fechaCreacion DATE NOT NULL
+	fechaCreacion VARCHAR(10) NOT NULL
 )
-INSERT INTO TipoRecurso(nombre,fechaCreacion) VALUES ('Natural',GETDATE())
-INSERT INTO TipoRecurso(nombre,fechaCreacion) VALUES ('Etnografico',GETDATE())
-INSERT INTO TipoRecurso(nombre,fechaCreacion) VALUES ('Geologico',GETDATE())
-INSERT INTO TipoRecurso(nombre,fechaCreacion) VALUES ('De paisaje',GETDATE())
-INSERT INTO TipoRecurso(nombre,fechaCreacion) VALUES ('Arquitectonico',GETDATE())
-INSERT INTO TipoRecurso(nombre,fechaCreacion) VALUES ('Arqueologico',GETDATE())
+INSERT INTO TipoRecurso(nombre,fechaCreacion) VALUES ('Natural',CONVERT(NVARCHAR(10),GETDATE(),103))
+INSERT INTO TipoRecurso(nombre,fechaCreacion) VALUES ('Etnografico',CONVERT(NVARCHAR(10),GETDATE(),103))
+INSERT INTO TipoRecurso(nombre,fechaCreacion) VALUES ('Geologico',CONVERT(NVARCHAR(10),GETDATE(),103))
+INSERT INTO TipoRecurso(nombre,fechaCreacion) VALUES ('De paisaje',CONVERT(NVARCHAR(10),GETDATE(),103))
+INSERT INTO TipoRecurso(nombre,fechaCreacion) VALUES ('Arquitectonico',CONVERT(NVARCHAR(10),GETDATE(),103))
+INSERT INTO TipoRecurso(nombre,fechaCreacion) VALUES ('Arqueologico',CONVERT(NVARCHAR(10),GETDATE(),103))
 GO
 
 /**
