@@ -140,7 +140,7 @@ CREATE TABLE Usuario(
 )
 GO
 
-INSERT INTO Usuario(nombre,cedula,correo,usuario,contrasena,admin) VALUES ('admin','123456789','fabioClacome@sinac.co.cr','admin','admin')
+INSERT INTO Usuario(nombre,cedula,correo,usuario,contrasena,admin) VALUES ('admin','123456789','admin@sinac.co.cr','admin','admin',1)
 GO
 
 
