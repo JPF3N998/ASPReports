@@ -35,7 +35,11 @@ CREATE TABLE Sitios(
 	tamano NVARCHAR(512) NOT NULL,
 	capacidad NVARCHAR(128) NOT NULL,
 	observacionesDisenoInfraestructura NVARCHAR(1024),
-	valoracion FLOAT NOT NULL,
+	valoracionRelacionPropositoASP FLOAT NOT NULL,
+	valoracionRelacionTemasInterpretativos FLOAT NOT NULL,
+	valoracionVariedadRecurso FLOAT NOT NULL,
+	valoracionAtractivo FLOAT NOT NULL,
+	valoracionAccesibilidad FLOAT NOT NULL,
 	fechaCreacion NVARCHAR(10) NOT NULL,
 	activo BIT NOT NULL,
 	FOREIGN KEY (idASP) REFERENCES ASP(id)
@@ -82,6 +86,7 @@ CREATE TABLE RatingRecurso(
 	relacionPropositoASP INT NOT NULL,
 	relacionTemaInterpretativoASP INT NOT NULL,
 	variedadRecurso INT NOT NULL,
+	atractivo INT NOT NULL,
 	accesibilidad INT NOT NULL,
 	fechaModificacion NVARCHAR(10) NOT NULL,
 
@@ -131,6 +136,11 @@ CREATE TABLE IndicadorUmbrales(
 	FOREIGN KEY (idOportunidad) REFERENCES Oportunidades(id)
 )
 GO
+
+DROP TABLE IF EXISTS Afectaciones
+--CREATE TABLE Afectaciones()GO
+
+
 DROP TABLE IF EXISTS Usuario
 CREATE TABLE Usuario(
 	id INT PRIMARY KEY IDENTITY(1,1),
