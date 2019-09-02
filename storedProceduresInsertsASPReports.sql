@@ -1,40 +1,6 @@
 USE ASPReports
 GO
 
---PROC para traer el ID de ASP  por nombre
-DROP PROC IF EXISTS spGetIDASP
-GO
-
-CREATE PROC spGetIDAsp @nombreInput NVARCHAR(64),@idOutput INT OUTPUT AS
-BEGIN
-	SET @idOutput = (SELECT A.id FROM ASP A WHERE A.nombre = @nombreInput);
-END
-GO
-
---PROC para traer el ID de sitio por ID del ASP y nombre del sitio
-DROP PROC IF EXISTS spGetIDSitio
-GO
-
-CREATE PROC spGetIDSitio @idASP INT,@nombreSitio NVARCHAR(64),@idOutput INT OUTPUT AS
-BEGIN
-	SET @idOutput = (SELECT S.id FROM Sitios S WHERE S.idASP = @idASP AND S.nombre = @nombreSitio);
-END
-GO
-/*
-declare @res int
-exec spGetIDSitio 1,'Crater',@res
-print( convert(nvarchar(1),@res))
-*/
---PROC para traer el ID del recurso por medio del idSitio y nombre del recurso
-DROP PROC IF EXISTS spGetIDRecurso
-GO
-
-CREATE PROC spGetIDRecurso @idSitio INT, @nombreRecurso NVARCHAR(64),@idOutput INT OUTPUT AS
-BEGIN
-	SET @idOutput = (SELECT R.id FROM Recursos R WHERE R.idSitio = @idSitio AND @nombreRecurso= R.nombre);
-END
-GO
-
 --PROC para la creacion de un ASP
 
 DROP PROC IF EXISTS spAgregarASP
@@ -177,7 +143,7 @@ BEGIN
 END
 GO
 
-
+--PROC para actualizar los ratings de un recurso
 DROP PROC IF EXISTS spActualizarRatingRecurso
 GO
 CREATE PROC spActualizarRatingRecurso
@@ -319,7 +285,7 @@ BEGIN
 END
 GO
 
-
+--PROC para agregar una oportunidad
 DROP PROC IF EXISTS spAgregarOportunidad
 GO
 CREATE PROC spAgregarOportunidad 
@@ -372,11 +338,6 @@ BEGIN
 		END
 END
 GO
-
-
-
-
-
 
 
 /*

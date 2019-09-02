@@ -12,7 +12,7 @@ GO
 USE ASPReports
 GO
 
-
+--Creacion de la tabla de ASPs
 DROP TABLE IF EXISTS ASP
 GO
 CREATE TABLE ASP(
@@ -24,6 +24,7 @@ CREATE TABLE ASP(
 )
 GO
 
+--Creacion de la tabla de sitios
 DROP TABLE IF EXISTS Sitios
 CREATE TABLE Sitios(
 	id INT IDENTITY(1,1) PRIMARY KEY,
@@ -79,6 +80,7 @@ CREATE TABLE Recursos(
 )
 GO
 
+--Atributos para el rating de los recursos
 DROP TABLE IF EXISTS RatingRecurso
 CREATE TABLE RatingRecurso(
 	id INT IDENTITY(1,1) PRIMARY KEY,
@@ -94,6 +96,7 @@ CREATE TABLE RatingRecurso(
 )
 GO
 
+--Atributos para recurso
 DROP TABLE IF EXISTS AtributosRecurso
 CREATE TABLE AtributosRecurso(
 	id INT IDENTITY(1,1) PRIMARY KEY,
@@ -109,6 +112,8 @@ CREATE TABLE AtributosRecurso(
 )
 GO
 
+
+--Creacion de la tabla de Oportunidades
 DROP TABLE IF EXISTS Oportunidades
 CREATE TABLE Oportunidades(
 	id INT IDENTITY(1,1) PRIMARY KEY,
@@ -141,7 +146,7 @@ GO
 DROP TABLE IF EXISTS Afectaciones
 --CREATE TABLE Afectaciones()GO
 
-
+--Creacion de la tablas para usuarios
 DROP TABLE IF EXISTS Usuario
 CREATE TABLE Usuario(
 	id INT PRIMARY KEY IDENTITY(1,1),
@@ -155,6 +160,7 @@ CREATE TABLE Usuario(
 )
 GO
 
+--Adicion de la cuenta administradora
 INSERT INTO Usuario(nombre,cedula,correo,usuario,contrasena,admin,activo) VALUES ('Administrador','123456789','admin@sinac.co.cr','admin','admin',1,1)
 GO
 
