@@ -113,8 +113,9 @@ DROP TABLE IF EXISTS Oportunidades
 CREATE TABLE Oportunidades(
 	id INT IDENTITY(1,1) PRIMARY KEY,
 	idRecurso INT NOT NULL,
-	nombre NVARCHAR(256) NOT NULL,
-	fechaCreacion NVARCHAR(10) NOT NULL,
+	descripcion NVARCHAR(512) NOT NULL,
+	observaciones NVARCHAR(1024) NOT NULL, --Campo para riesgos y detalles importantes
+	fechaModificacion NVARCHAR(10) NOT NULL,
 	activo BIT NOT NULL,
 	FOREIGN KEY (idRecurso) REFERENCES Recursos(id)
 )

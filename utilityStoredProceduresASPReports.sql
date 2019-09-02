@@ -24,7 +24,6 @@ CREATE PROC spLogin @nombreUsuarioInput NVARCHAR(50), @passwordInput NVARCHAR(50
 								SET @adminBIT = 0;
 								RETURN 0; /*2 para cliente*/
 							END
-						
 					END
 				ELSE
 					BEGIN

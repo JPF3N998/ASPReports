@@ -319,6 +319,66 @@ BEGIN
 END
 GO
 
+
+DROP PROC IF EXISTS spAgregarOportunidad
+GO
+CREATE PROC spAgregarOportunidad 
+	@nombreASPInput NVARCHAR(64),
+	@nombreSitioInput NVARCHAR(64),
+	@nombreRecursoInput NVARCHAR(128),
+	@descripcionInput NVARCHAR(512),
+	@observacionesInput NVARCHAR(1024) AS
+BEGIN
+	DECLARE @idASP INT;
+	EXEC spGetIDAsp @nombreASPInput,@idASP OUTPUT;
+	IF @idASP IS NOT NULL
+		BEGIN
+			DECLARE @idSitio INT;
+			EXEC spGetIDSitio @idASP,@nombreSitioInput,@idSitio OUTPUT;
+			IF @idSitio IS NULL
+				BEGIN
+					DECLARE @idRecurso INT;
+					EXEC spGetIDRecurso @idSitio,@nombreRecursoInput,@idRecurso OUTPUT;
+					IF @idRecurso IS NOT NULL
+						BEGIN
+							BEGIN TRY
+								BEGIN TRANSACTION
+									INSERT INTO Oportunidades(idRecurso,descripcion,observaciones,fechaModificacion,activo)
+									VALUES (@idRecurso,@descripcionInput,@observacionesInput,CONVERT(NVARCHAR(15),GETDATE(),103),1)
+								COMMIT
+							END TRY
+							BEGIN CATCH
+								IF @@TRANCOUNT > 0
+								ROLLBACK
+								RETURN -1*@@ERROR
+							END CATCH
+						END
+					ELSE
+						BEGIN
+							PRINT 'Recurso no existe'
+							RETURN -1
+						END
+				END
+			ELSE
+				BEGIN
+					PRINT 'No existe ese sitio'
+					RETURN -1
+				END
+		END
+	ELSE
+		BEGIN
+			PRINT 'No existe ese ASP'
+			RETURN -1
+		END
+END
+GO
+
+
+
+
+
+
+
 /*
 EXEC spAgregarASP 'Volcan Irazu','Cartago'
 GO
