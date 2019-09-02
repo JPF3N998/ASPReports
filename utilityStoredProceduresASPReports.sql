@@ -55,6 +55,134 @@ CREATE PROC spGetIDTipoRecurso @nombreTipoRecursoInput NVARCHAR(128), @idRecurso
 	END
 GO
 
+--PROC para agregar los ratings a los atributos de recurso
+
+DROP PROC IF EXISTS spActualizarRatingAtributos
+GO
+CREATE PROC spActualizarRatingAtributos 
+	@nombreASPInput NVARCHAR(64),
+	@nombreSitioInput NVARCHAR(64),
+	@nombreRecursoInput NVARCHAR(128),
+	@rDisponibilidad INT,
+	@rCapacidadAbsorcionUsoTuristico INT,
+	@rCapacidadTolerarUsoTuristico INT,
+	@rInteresPotencialAvisitantes INT,
+	@rImportanciaSPTI INT AS
+BEGIN
+	DECLARE @idASP INT;
+	EXEC spGetIDAsp @nombreASPInput,@idASP OUTPUT;
+	IF @idASP IS NOT NULL
+		BEGIN
+			DECLARE @idSitio INT;
+			EXEC spGetIDSitio @idASP,@nombreASPInput,@idSitio OUTPUT;
+			IF @idSitio IS NOT NULL
+				BEGIN
+					DECLARE @idRecurso INT;
+					EXEC spGetIDRecurso @idSitio, @nombreRecursoInput,@idRecurso OUTPUT;
+					IF @idRecurso IS NOT NULL
+						BEGIN
+							BEGIN TRY
+								BEGIN TRANSACTION
+									UPDATE AtributosRecurso
+										SET AtributosRecurso.disponibilidad = @rDisponibilidad,
+											AtributosRecurso.capacidadAbsorcionUsoTuristico  = @rCapacidadAbsorcionUsoTuristico,
+											AtributosRecurso.capacidadTolerarUsoTuristico = @rCapacidadTolerarUsoTuristico,
+											AtributosRecurso.interesPotencialAvisitantes = @rInteresPotencialAvisitantes,
+											AtributosRecurso.importanciaSPTI = @rImportanciaSPTI,
+											AtributosRecurso.fechaModificacion = CONVERT(NVARCHAR(15),GETDATE(),103)
+										WHERE @idRecurso = AtributosRecurso.idRecurso
+								COMMIT
+							END TRY
+							BEGIN CATCH
+								IF @@TRANCOUNT > 0
+									ROLLBACK
+									RETURN -1*@@ERROR
+							END CATCH
+						END
+					ELSE
+						BEGIN
+							PRINT 'Recurso no existe'
+							RETURN -1
+						END
+				END
+			ELSE
+				BEGIN
+					PRINT 'No existe ese sitio'
+					RETURN -1
+				END
+		END
+	ELSE
+		BEGIN
+			PRINT 'No existe ese ASP'
+			RETURN -1
+		END
+END
+GO
+
+--PROC para actualizar los ratings de un recurso
+DROP PROC IF EXISTS spActualizarRatingRecurso
+GO
+CREATE PROC spActualizarRatingRecurso
+	@nombreASPInput NVARCHAR(64),
+	@nombreSitioInput NVARCHAR(64),
+	@nombreRecursoInput NVARCHAR(128),
+	@rRelacionPropositoASP INT,
+	@rRelacionTemaInterpretativoASP INT,
+	@rVariedadRecurso INT,
+	@rAtractivo INT,
+	@rAccesibildad INT AS
+BEGIN
+	DECLARE @idASP INT;
+	EXEC spGetIDAsp @nombreASPInput,@idASP OUTPUT;
+	IF @idASP IS NOT NULL
+		BEGIN
+			DECLARE @idSitio INT;
+			EXEC spGetIDSitio @idASP,@nombreASPInput,@idSitio OUTPUT;
+			IF @idSitio IS NOT NULL
+				BEGIN
+					DECLARE @idRecurso INT;
+					EXEC spGetIDRecurso @idSitio, @nombreRecursoInput,@idRecurso OUTPUT;
+					IF @idRecurso IS NOT NULL
+						BEGIN
+							BEGIN TRY
+								BEGIN TRANSACTION
+									UPDATE RatingRecurso
+										SET RatingRecurso.relacionPropositoASP = @rRelacionPropositoASP,
+											RatingRecurso.relacionTemaInterpretativoASP = @rRelacionTemaInterpretativoASP,
+											RatingRecurso.variedadRecurso = @rVariedadRecurso,
+											RatingRecurso.atractivo = @rAtractivo,
+											RatingRecurso.accesibilidad = @rAccesibildad,
+											RatingRecurso.fechaModificacion = CONVERT(NVARCHAR(15),GETDATE(),103)
+										WHERE @idRecurso = RatingRecurso.idRecurso
+								COMMIT
+							END TRY
+							BEGIN CATCH
+								IF @@TRANCOUNT > 0
+									ROLLBACK
+									RETURN -1*@@ERROR
+							END CATCH
+						END
+					ELSE
+						BEGIN
+							PRINT 'Recurso no existe'
+							RETURN -1
+						END
+				END
+			ELSE
+				BEGIN
+					PRINT 'No existe ese sitio'
+					RETURN -1
+				END
+		END
+	ELSE
+		BEGIN
+			PRINT 'No existe ese ASP'
+			RETURN -1
+		END
+END
+GO
+
+
 --PROC para el calculo de la valoracion(promedio) de un sitio
 DROP PROC IF EXISTS spActualizarValoracion
 GO
@@ -133,6 +261,25 @@ GO
 
 CREATE PROC spGetIDRecurso @idSitio INT, @nombreRecurso NVARCHAR(64),@idOutput INT OUTPUT AS
 BEGIN
-	SET @idOutput = (SELECT R.id FROM Recursos R WHERE R.idSitio = @idSitio AND @nombreRecurso= R.nombre);
+	SET @idOutput = (SELECT R.id FROM Recursos R WHERE R.idSitio = @idSitio AND @nombreRecurso LIKE R.nombre);
 END
+GO
+
+--PROC que retorna el id de tipo figura a partir del nombre
+DROP PROC IF EXISTS spGetIDTipoFigura
+GO
+
+CREATE PROC spGetIDTipoFigura @nombreTipoFigura NVARCHAR(32),@idTipoFigura INT OUTPUT AS
+	BEGIN
+		SET @idTipoFigura = (SELECT TF.id FROM TipoFigura TF WHERE TF.nombre LIKE @nombreTipoFigura)
+		IF @idTipoFigura IS NULL
+			BEGIN
+				PRINT CONCAT('No existe figura ',@nombreTipoFigura)
+				RETURN -1
+			END
+		ELSE
+			BEGIN
+				RETURN 0
+			END
+	END
 GO

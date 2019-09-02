@@ -38,6 +38,7 @@ CREATE PROC spAgregarSitio
 	@nombreASPInput NVARCHAR(64),
 	@nombreSitioInput NVARCHAR(64),
 	@ubicacionInput NVARCHAR(256),
+	@nombreTipoFiguraInput NVARCHAR(32),
 	@convenienciaInput NVARCHAR(512),
 	@calidadInput NVARCHAR(512),
 	@tamanoInput NVARCHAR(512),
@@ -54,9 +55,11 @@ CREATE PROC spAgregarSitio
 				IF @idSitio IS NULL
 					BEGIN
 						BEGIN TRY
+							DECLARE @idTipoFigura INT;
+							EXEC spGetIDTipoFigura @nombreTipoFiguraInput,@idTipoFigura OUTPUT
 							BEGIN TRANSACTION
-								INSERT INTO Sitios(idASP,nombre,ubicacion,conveniencia,calidad,tamano,capacidad,observacionesDisenoInfraestructura,valoracionRelacionPropositoASP,valoracionRelacionTemasInterpretativos,valoracionVariedadRecurso,valoracionAtractivo,valoracionAccesibilidad,fechaCreacion,activo)
-								VALUES (@idASP,@nombreSitioInput,@ubicacionInput,@convenienciaInput,@calidadInput,@tamanoInput,@capacidadInput,@observacionesDisenoInfraestructuraInput,0,0,0,0,0,CONVERT(VARCHAR(10),GETDATE(),103),1)
+								INSERT INTO Sitios(idASP,nombre,ubicacion,idTipoFigura,conveniencia,calidad,tamano,capacidad,observacionesDisenoInfraestructura,valoracionRelacionPropositoASP,valoracionRelacionTemasInterpretativos,valoracionVariedadRecurso,valoracionAtractivo,valoracionAccesibilidad,fechaCreacion,activo)
+								VALUES (@idASP,@nombreSitioInput,@ubicacionInput,@idTipoFigura,@convenienciaInput,@calidadInput,@tamanoInput,@capacidadInput,@observacionesDisenoInfraestructuraInput,0,0,0,0,0,CONVERT(VARCHAR(10),GETDATE(),103),1)
 							COMMIT
 						END TRY
 						BEGIN CATCH
@@ -246,7 +249,7 @@ BEGIN
 								EXEC spGetIDTipoRecurso @nombreTipoRecursoInput,@idTipoRecurso OUTPUT;
 								BEGIN TRANSACTION
 
-									INSERT INTO Recursos(idTipoRecurso,idSitio,nombre,activo) VALUES (@idTipoRecurso,@idSitio,@nombreRecursoInput,1)
+									INSERT INTO Recursos(idTipoRecurso,idSitio,nombre,fechaModificacion,activo) VALUES (@idTipoRecurso,@idSitio,@nombreRecursoInput,CONVERT(NVARCHAR(15),GETDATE(),103),1)
 									
 
 									INSERT INTO RatingRecurso(idRecurso,relacionPropositoASP,relacionTemaInterpretativoASP,variedadRecurso,atractivo,accesibilidad,fechaModificacion)
@@ -292,6 +295,7 @@ CREATE PROC spAgregarOportunidad
 	@nombreASPInput NVARCHAR(64),
 	@nombreSitioInput NVARCHAR(64),
 	@nombreRecursoInput NVARCHAR(128),
+	@nombreOportunidadInput NVARCHAR(32),
 	@descripcionInput NVARCHAR(512),
 	@observacionesInput NVARCHAR(1024) AS
 BEGIN
@@ -309,8 +313,8 @@ BEGIN
 						BEGIN
 							BEGIN TRY
 								BEGIN TRANSACTION
-									INSERT INTO Oportunidades(idRecurso,descripcion,observaciones,fechaModificacion,activo)
-									VALUES (@idRecurso,@descripcionInput,@observacionesInput,CONVERT(NVARCHAR(15),GETDATE(),103),1)
+									INSERT INTO Oportunidades(idRecurso,nombre,descripcion,observaciones,fechaModificacion,activo)
+									VALUES (@idRecurso,@nombreOportunidadInput,@descripcionInput,@observacionesInput,CONVERT(NVARCHAR(15),GETDATE(),103),1)
 								COMMIT
 							END TRY
 							BEGIN CATCH

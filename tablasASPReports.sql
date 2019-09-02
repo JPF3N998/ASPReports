@@ -24,11 +24,21 @@ CREATE TABLE ASP(
 )
 GO
 
+--Creacion de la tabla para los tipos de figura
+DROP TABLE IF EXISTS TipoFigura
+GO
+CREATE TABLE TipoFigura(
+	id INT IDENTITY(1,1) PRIMARY KEY,
+	nombre NVARCHAR(32) NOT NULL
+)
+GO
+
 --Creacion de la tabla de sitios
 DROP TABLE IF EXISTS Sitios
 CREATE TABLE Sitios(
 	id INT IDENTITY(1,1) PRIMARY KEY,
-	idASP INT NOT NULL, 
+	idASP INT NOT NULL,
+	idTipoFigura INT NOT NULL, 
 	nombre NVARCHAR(64) NOT NULL,
 	ubicacion NVARCHAR(256) NOT NULL,
 	conveniencia NVARCHAR(512) NOT NULL,
@@ -43,7 +53,8 @@ CREATE TABLE Sitios(
 	valoracionAccesibilidad FLOAT NOT NULL,
 	fechaCreacion NVARCHAR(10) NOT NULL,
 	activo BIT NOT NULL,
-	FOREIGN KEY (idASP) REFERENCES ASP(id)
+	FOREIGN KEY (idASP) REFERENCES ASP(id),
+	FOREIGN KEY (idTipoFigura) REFERENCES TipoFigura(id)
 )
 GO
 
@@ -74,6 +85,7 @@ CREATE TABLE Recursos(
 	idTipoRecurso INT NOT NULL,
 	idSitio INT NOT NULL,
 	nombre NVARCHAR(128) NOT NULL,
+	fechaModificacion NVARCHAR(10) NOT NULL,
 	activo BIT NOT NULL,
 	FOREIGN KEY (idTipoRecurso) REFERENCES TipoRecurso(id),
 	FOREIGN KEY (idSitio) REFERENCES Sitios(id)
@@ -118,6 +130,7 @@ DROP TABLE IF EXISTS Oportunidades
 CREATE TABLE Oportunidades(
 	id INT IDENTITY(1,1) PRIMARY KEY,
 	idRecurso INT NOT NULL,
+	nombre NVARCHAR(64) NOT NULL,
 	descripcion NVARCHAR(512) NOT NULL,
 	observaciones NVARCHAR(1024) NOT NULL, --Campo para riesgos y detalles importantes
 	fechaModificacion NVARCHAR(10) NOT NULL,
