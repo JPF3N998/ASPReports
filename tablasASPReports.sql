@@ -41,6 +41,7 @@ CREATE TABLE Sitios(
 	idTipoFigura INT NOT NULL, 
 	nombre NVARCHAR(64) NOT NULL,
 	ubicacion NVARCHAR(256) NOT NULL,
+	zonificacion BIT NOT NULL,
 	conveniencia NVARCHAR(512) NOT NULL,
 	calidad NVARCHAR(512) NOT NULL,
 	tamano NVARCHAR(512) NOT NULL,
@@ -129,7 +130,7 @@ GO
 DROP TABLE IF EXISTS Oportunidades
 CREATE TABLE Oportunidades(
 	id INT IDENTITY(1,1) PRIMARY KEY,
-	idRecurso INT NOT NULL,
+	idSitio INT NOT NULL,
 	nombre NVARCHAR(64) NOT NULL,
 	descripcion NVARCHAR(512) NOT NULL,
 	observaciones NVARCHAR(1024) NOT NULL, --Campo para riesgos y detalles importantes
@@ -138,26 +139,6 @@ CREATE TABLE Oportunidades(
 	FOREIGN KEY (idRecurso) REFERENCES Recursos(id)
 )
 GO
-
---Explicacion y ejemplo de indicador y umbrales en las paginas 21 a 25
-DROP TABLE IF EXISTS IndicadorUmbrales
-CREATE TABLE IndicadorUmbrales(
-	id INT IDENTITY(1,1) PRIMARY KEY,
-	idOportunidad INT NOT NULL,
-	indicador NVARCHAR(512) NOT NULL,
-	optimo NVARCHAR(1024) NOT NULL,
-	aceptable NVARCHAR(1024) NOT NULL,
-	inaceptable NVARCHAR(1024) NOT NULL,
-	acciones NVARCHAR(2048) NOT NULL,
-	estadoActual NVARCHAR(20) NOT NULL,
-	fechaModificacion NVARCHAR(10) NOT NULL,
-
-	FOREIGN KEY (idOportunidad) REFERENCES Oportunidades(id)
-)
-GO
-
-DROP TABLE IF EXISTS Afectaciones
---CREATE TABLE Afectaciones()GO
 
 --Creacion de la tablas para usuarios
 DROP TABLE IF EXISTS Usuario

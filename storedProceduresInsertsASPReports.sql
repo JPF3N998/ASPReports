@@ -38,6 +38,7 @@ CREATE PROC spAgregarSitio
 	@nombreASPInput NVARCHAR(64),
 	@nombreSitioInput NVARCHAR(64),
 	@ubicacionInput NVARCHAR(256),
+	@zonificacionInput BIT,
 	@nombreTipoFiguraInput NVARCHAR(32),
 	@convenienciaInput NVARCHAR(512),
 	@calidadInput NVARCHAR(512),
@@ -58,8 +59,8 @@ CREATE PROC spAgregarSitio
 							DECLARE @idTipoFigura INT;
 							EXEC spGetIDTipoFigura @nombreTipoFiguraInput,@idTipoFigura OUTPUT
 							BEGIN TRANSACTION
-								INSERT INTO Sitios(idASP,nombre,ubicacion,idTipoFigura,conveniencia,calidad,tamano,capacidad,observacionesDisenoInfraestructura,valoracionRelacionPropositoASP,valoracionRelacionTemasInterpretativos,valoracionVariedadRecurso,valoracionAtractivo,valoracionAccesibilidad,fechaCreacion,activo)
-								VALUES (@idASP,@nombreSitioInput,@ubicacionInput,@idTipoFigura,@convenienciaInput,@calidadInput,@tamanoInput,@capacidadInput,@observacionesDisenoInfraestructuraInput,0,0,0,0,0,CONVERT(VARCHAR(10),GETDATE(),103),1)
+								INSERT INTO Sitios(idASP,nombre,ubicacion,zonificacion,idTipoFigura,conveniencia,calidad,tamano,capacidad,observacionesDisenoInfraestructura,valoracionRelacionPropositoASP,valoracionRelacionTemasInterpretativos,valoracionVariedadRecurso,valoracionAtractivo,valoracionAccesibilidad,fechaCreacion,activo)
+								VALUES (@idASP,@nombreSitioInput,@ubicacionInput,@zonificacionInput,@idTipoFigura,@convenienciaInput,@calidadInput,@tamanoInput,@capacidadInput,@observacionesDisenoInfraestructuraInput,0,0,0,0,0,CONVERT(VARCHAR(10),GETDATE(),103),1)
 							COMMIT
 						END TRY
 						BEGIN CATCH
@@ -294,7 +295,6 @@ GO
 CREATE PROC spAgregarOportunidad 
 	@nombreASPInput NVARCHAR(64),
 	@nombreSitioInput NVARCHAR(64),
-	@nombreRecursoInput NVARCHAR(128),
 	@nombreOportunidadInput NVARCHAR(32),
 	@descripcionInput NVARCHAR(512),
 	@observacionesInput NVARCHAR(1024) AS
@@ -305,30 +305,20 @@ BEGIN
 		BEGIN
 			DECLARE @idSitio INT;
 			EXEC spGetIDSitio @idASP,@nombreSitioInput,@idSitio OUTPUT;
-			IF @idSitio IS NULL
+			IF @idSitio IS NOT NULL
 				BEGIN
-					DECLARE @idRecurso INT;
-					EXEC spGetIDRecurso @idSitio,@nombreRecursoInput,@idRecurso OUTPUT;
-					IF @idRecurso IS NOT NULL
-						BEGIN
-							BEGIN TRY
-								BEGIN TRANSACTION
-									INSERT INTO Oportunidades(idRecurso,nombre,descripcion,observaciones,fechaModificacion,activo)
-									VALUES (@idRecurso,@nombreOportunidadInput,@descripcionInput,@observacionesInput,CONVERT(NVARCHAR(15),GETDATE(),103),1)
-								COMMIT
-							END TRY
-							BEGIN CATCH
-								IF @@TRANCOUNT > 0
-								ROLLBACK
-								RETURN -1*@@ERROR
-							END CATCH
-						END
-					ELSE
-						BEGIN
-							PRINT 'Recurso no existe'
-							RETURN -1
-						END
-				END
+					BEGIN TRY
+						BEGIN TRANSACTION
+							INSERT INTO Oportunidades(idSitio,nombre,descripcion,observaciones,fechaModificacion,activo)
+							VALUES (@idSitio,@nombreOportunidadInput,@descripcionInput,@observacionesInput,CONVERT(NVARCHAR(15),GETDATE(),103),1)
+						COMMIT
+					END TRY
+					BEGIN CATCH
+						IF @@TRANCOUNT > 0
+						ROLLBACK
+						RETURN -1*@@ERROR
+					END CATCH
+				END	
 			ELSE
 				BEGIN
 					PRINT 'No existe ese sitio'
