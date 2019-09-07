@@ -170,9 +170,7 @@ CREATE PROC spModificarOportunidad
 							BEGIN TRY
 								BEGIN TRANSACTION
 									UPDATE Oportunidades
-										SET Oportunidades.idRecurso = @idRecurso,
-											Oportunidades.nombre = @nombreOportunidadInput,
-											Oportunidades.descripcion = @descripcionInput,
+										SET Oportunidades.descripcion = @descripcionInput,
 											Oportunidades.observaciones = @observacionesInput,
 											Oportunidades.fechaModificacion = CONVERT(NVARCHAR(15),GETDATE(),103)
 

@@ -255,6 +255,15 @@ BEGIN
 END
 GO
 
+--PROC para traer el ID de oportunidad a partir de la descripcion de oportunidad
+DROP PROC IF EXISTS spGetIdOportunidad
+GO
+CREATE PROC spGetIDOportunidad @idASP INT,@descripcionOportunidad NVARCHAR(512),@idOutput INT OUTPUT AS
+BEGIN
+	SET @idOutput = (SELECT O.id FROM Oportunidades O WHERE LOWER(O.descripcion) = LOWER(@descripcionOportunidad));
+END
+GO
+
 --PROC para traer el ID del recurso por medio del idSitio y nombre del recurso
 DROP PROC IF EXISTS spGetIDRecurso
 GO
@@ -283,3 +292,61 @@ CREATE PROC spGetIDTipoFigura @nombreTipoFigura NVARCHAR(32),@idTipoFigura INT O
 			END
 	END
 GO
+
+--PROC para indicar si un ASP esta activo o no
+DROP PROC IF EXISTS spASPActivo
+GO
+CREATE PROC spASPActivo @idASP INT, @activoOut BIT OUTPUT AS
+BEGIN
+	
+	IF (SELECT A.activo FROM ASP A WHERE A.id = @idASP) = 0
+		SET @activoOut = 0
+	ELSE
+		SET @activoOut = 1
+	
+END
+GO
+
+--PROC para indicar si un Sitio esta activo o no
+DROP PROC IF EXISTS spSitioActivo
+GO
+CREATE PROC spSitioActivo @idSitio INT, @activoOut BIT OUTPUT AS
+BEGIN
+	
+	IF (SELECT S.activo FROM Sitios S WHERE S.id = @idSitio) = 0
+		SET @activoOut = 0
+	ELSE
+		SET @activoOut = 1
+	
+END
+GO
+
+--PROC para indicar si una Oportunidad esta activo o no
+DROP PROC IF EXISTS spOportunidadActivo
+GO
+CREATE PROC spOportunidadActivo @idOportunidad INT, @activoOut BIT OUTPUT AS
+BEGIN
+	
+	IF (SELECT O.activo FROM Oportunidades O WHERE o.id = @idOportunidad) = 0
+		SET @activoOut = 0
+	ELSE
+		SET @activoOut = 1
+	
+END
+GO
+
+--PROC para indicar si un Recurso esta activo o no
+DROP PROC IF EXISTS spRecursoActivo
+GO
+CREATE PROC spRecursoActivo @idRecurso INT, @activoOut BIT OUTPUT AS
+BEGIN
+	
+	IF (SELECT R.activo FROM Recursos R WHERE R.id = @idRecurso) = 0
+		SET @activoOut = 0
+	ELSE
+		SET @activoOut = 1
+	
+END
+GO
+
+

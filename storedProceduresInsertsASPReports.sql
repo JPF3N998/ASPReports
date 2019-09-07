@@ -1,20 +1,21 @@
 USE ASPReports
 GO
 
---PROC para la creacion de un ASP
+--PROC para la creacion de un ASP, si esta desactivado, se activa
 
 DROP PROC IF EXISTS spAgregarASP
 GO
 
 CREATE PROC spAgregarASP @nombreInput NVARCHAR(64),@ubicacionInput NVARCHAR(256) AS
 	BEGIN
-		DECLARE @nombreASPExistente INT;
-		EXEC spGetIDAsp @nombreInput, @nombreASPExistente OUTPUT;
-		IF @nombreASPExistente IS NULL
+		DECLARE @idASP INT;
+		EXEC spGetIDAsp @nombreInput, @idASP OUTPUT;
+		IF @idASP IS NULL
 			BEGIN TRY
 				BEGIN TRANSACTION
 					INSERT INTO ASP(nombre,ubicacion,fechaCreacion,activo) VALUES (@nombreInput,@ubicacionInput,CONVERT(NVARCHAR(10),GETDATE(),103),1)
 				COMMIT
+				RETURN 0
 			END TRY
 			BEGIN CATCH
 				IF @@TRANCOUNT > 0
@@ -23,8 +24,28 @@ CREATE PROC spAgregarASP @nombreInput NVARCHAR(64),@ubicacionInput NVARCHAR(256)
 			END CATCH
 		ELSE
 			BEGIN
-				PRINT 'Ya existe ese ASP.'
-				RETURN -1
+				DECLARE @activo BIT;
+				EXEC spASPActivo @idASP,@activo OUTPUT
+				IF @activo = 0
+					BEGIN TRY
+						BEGIN TRANSACTION
+							UPDATE ASP
+								SET ASP.activo = 1,
+									ASP.fechaCreacion = CONVERT(NVARCHAR(15),GETDATE(),103)
+								WHERE ASP.id = @idASP
+						COMMIT
+						RETURN 0
+					END TRY
+					BEGIN CATCH
+						IF @@TRANCOUNT > 0
+							ROLLBACK
+							RETURN -1*@@ERROR
+					END CATCH
+				ELSE
+					BEGIN
+						PRINT 'Ya existe ese ASP' 
+						RETURN -1
+					END
 			END
 	END	
 GO
@@ -48,8 +69,10 @@ CREATE PROC spAgregarSitio
 
 	BEGIN
 		DECLARE @idASP INT;
+		DECLARE @activoASP BIT;
 		EXEC spGetIDAsp @nombreASPInput,@idASP OUTPUT;
-		IF @idASP IS NOT NULL
+		EXEC spASPActivo @idASP,@activoASP OUT;
+		IF @idASP IS NOT NULL AND @activoASP = 1
 			BEGIN
 				DECLARE @idSitio INT;
 				EXEC spGetIDSitio @idASP,@nombreSitioInput,@idSitio OUTPUT;
@@ -62,6 +85,7 @@ CREATE PROC spAgregarSitio
 								INSERT INTO Sitios(idASP,nombre,ubicacion,zonificacion,idTipoFigura,conveniencia,calidad,tamano,capacidad,observacionesDisenoInfraestructura,valoracionRelacionPropositoASP,valoracionRelacionTemasInterpretativos,valoracionVariedadRecurso,valoracionAtractivo,valoracionAccesibilidad,fechaCreacion,activo)
 								VALUES (@idASP,@nombreSitioInput,@ubicacionInput,@zonificacionInput,@idTipoFigura,@convenienciaInput,@calidadInput,@tamanoInput,@capacidadInput,@observacionesDisenoInfraestructuraInput,0,0,0,0,0,CONVERT(VARCHAR(10),GETDATE(),103),1)
 							COMMIT
+							RETURN 0
 						END TRY
 						BEGIN CATCH
 							IF @@TRANCOUNT > 0
@@ -71,143 +95,37 @@ CREATE PROC spAgregarSitio
 					END
 				ELSE
 					BEGIN
-						PRINT 'Sitio en este ASP ya existe'
-						RETURN -1
+						DECLARE @activo BIT;
+						EXEC spSitioActivo @idSitio,@activo OUTPUT
+						IF @idSitio = 0
+							BEGIN TRY
+								BEGIN TRANSACTION
+									UPDATE Sitios
+										SET Sitios.activo = 1,
+											Sitios.fechaCreacion = CONVERT(NVARCHAR(15),GETDATE(),103)
+										WHERE Sitios.id = @idSitio
+								COMMIT
+								RETURN 0
+							END TRY
+							BEGIN CATCH
+								IF @@TRANCOUNT > 0
+									ROLLBACK
+									RETURN -1*@@ERROR
+							END CATCH
+					ELSE
+						BEGIN
+							PRINT 'Sitio ya existe'
+							RETURN -1
+						END
 					END
 			END
 		ELSE
 			BEGIN
+				
 				PRINT 'ASP no existe'
 				RETURN -1
 			END
 	END
-GO
-
---PROC para agregar los ratings a los atributos de recurso
-
-DROP PROC IF EXISTS spActualizarRatingAtributos
-GO
-CREATE PROC spActualizarRatingAtributos 
-	@nombreASPInput NVARCHAR(64),
-	@nombreSitioInput NVARCHAR(64),
-	@nombreRecursoInput NVARCHAR(128),
-	@rDisponibilidad INT,
-	@rCapacidadAbsorcionUsoTuristico INT,
-	@rCapacidadTolerarUsoTuristico INT,
-	@rInteresPotencialAvisitantes INT,
-	@rImportanciaSPTI INT AS
-BEGIN
-	DECLARE @idASP INT;
-	EXEC spGetIDAsp @nombreASPInput,@idASP OUTPUT;
-	IF @idASP IS NOT NULL
-		BEGIN
-			DECLARE @idSitio INT;
-			EXEC spGetIDSitio @idASP,@nombreASPInput,@idSitio OUTPUT;
-			IF @idSitio IS NOT NULL
-				BEGIN
-					DECLARE @idRecurso INT;
-					EXEC spGetIDRecurso @idSitio, @nombreRecursoInput,@idRecurso OUTPUT;
-					IF @idRecurso IS NOT NULL
-						BEGIN
-							BEGIN TRY
-								BEGIN TRANSACTION
-									UPDATE AtributosRecurso
-										SET AtributosRecurso.disponibilidad = @rDisponibilidad,
-											AtributosRecurso.capacidadAbsorcionUsoTuristico  = @rCapacidadAbsorcionUsoTuristico,
-											AtributosRecurso.capacidadTolerarUsoTuristico = @rCapacidadTolerarUsoTuristico,
-											AtributosRecurso.interesPotencialAvisitantes = @rInteresPotencialAvisitantes,
-											AtributosRecurso.importanciaSPTI = @rImportanciaSPTI,
-											AtributosRecurso.fechaModificacion = CONVERT(NVARCHAR(15),GETDATE(),103)
-										WHERE @idRecurso = AtributosRecurso.idRecurso
-								COMMIT
-							END TRY
-							BEGIN CATCH
-								IF @@TRANCOUNT > 0
-									ROLLBACK
-									RETURN -1*@@ERROR
-							END CATCH
-						END
-					ELSE
-						BEGIN
-							PRINT 'Recurso no existe'
-							RETURN -1
-						END
-				END
-			ELSE
-				BEGIN
-					PRINT 'No existe ese sitio'
-					RETURN -1
-				END
-		END
-	ELSE
-		BEGIN
-			PRINT 'No existe ese ASP'
-			RETURN -1
-		END
-END
-GO
-
---PROC para actualizar los ratings de un recurso
-DROP PROC IF EXISTS spActualizarRatingRecurso
-GO
-CREATE PROC spActualizarRatingRecurso
-	@nombreASPInput NVARCHAR(64),
-	@nombreSitioInput NVARCHAR(64),
-	@nombreRecursoInput NVARCHAR(128),
-	@rRelacionPropositoASP INT,
-	@rRelacionTemaInterpretativoASP INT,
-	@rVariedadRecurso INT,
-	@rAtractivo INT,
-	@rAccesibildad INT AS
-BEGIN
-	DECLARE @idASP INT;
-	EXEC spGetIDAsp @nombreASPInput,@idASP OUTPUT;
-	IF @idASP IS NOT NULL
-		BEGIN
-			DECLARE @idSitio INT;
-			EXEC spGetIDSitio @idASP,@nombreASPInput,@idSitio OUTPUT;
-			IF @idSitio IS NOT NULL
-				BEGIN
-					DECLARE @idRecurso INT;
-					EXEC spGetIDRecurso @idSitio, @nombreRecursoInput,@idRecurso OUTPUT;
-					IF @idRecurso IS NOT NULL
-						BEGIN
-							BEGIN TRY
-								BEGIN TRANSACTION
-									UPDATE RatingRecurso
-										SET RatingRecurso.relacionPropositoASP = @rRelacionPropositoASP,
-											RatingRecurso.relacionTemaInterpretativoASP = @rRelacionTemaInterpretativoASP,
-											RatingRecurso.variedadRecurso = @rVariedadRecurso,
-											RatingRecurso.atractivo = @rAtractivo,
-											RatingRecurso.accesibilidad = @rAccesibildad,
-											RatingRecurso.fechaModificacion = CONVERT(NVARCHAR(15),GETDATE(),103)
-										WHERE @idRecurso = RatingRecurso.idRecurso
-								COMMIT
-							END TRY
-							BEGIN CATCH
-								IF @@TRANCOUNT > 0
-									ROLLBACK
-									RETURN -1*@@ERROR
-							END CATCH
-						END
-					ELSE
-						BEGIN
-							PRINT 'Recurso no existe'
-							RETURN -1
-						END
-				END
-			ELSE
-				BEGIN
-					PRINT 'No existe ese sitio'
-					RETURN -1
-				END
-		END
-	ELSE
-		BEGIN
-			PRINT 'No existe ese ASP'
-			RETURN -1
-		END
-END
 GO
 
 --PROC para agregar recursos con sus ratings y atributos
@@ -235,14 +153,24 @@ CREATE PROC spAgregarRecurso
 BEGIN
 	DECLARE @idASP INT;
 	EXEC spGetIDAsp @nombreASPInput,@idASP OUTPUT;
-	IF @idASP IS NOT NULL
+
+	DECLARE @ASPActivo BIT;
+	EXEC spASPActivo @idASP, @ASPActivo OUTPUT;
+
+	IF @idASP IS NOT NULL AND @ASPActivo = 1
 		BEGIN
 			DECLARE @idSitio INT;
 			EXEC spGetIDSitio @idASP,@nombreSitioInput,@idSitio OUTPUT;
-			IF @idSitio IS NOT NULL
+
+			DECLARE @sitioActivo BIT;
+			EXEC spSitioActivo @idSitio,@sitioActivo OUTPUT;
+
+			IF @idSitio IS NOT NULL AND @sitioActivo = 1
 				BEGIN
+
 					DECLARE @idRecurso INT;
 					EXEC spGetIDRecurso @idSitio,@nombreRecursoInput,@idRecurso OUTPUT;
+					
 					IF @idRecurso IS NULL
 						BEGIN
 							BEGIN TRY
@@ -262,6 +190,7 @@ BEGIN
 									EXEC spActualizarValoracion @nombreASPInput, @nombreSitioInput
 									
 								COMMIT
+								RETURN 0
 							END TRY
 							BEGIN CATCH
 								IF @@TRANCOUNT > 0
@@ -271,9 +200,34 @@ BEGIN
 						END
 					ELSE
 						BEGIN
-							PRINT 'Recurso ya existe'
-							RETURN -1
+							
+							DECLARE @recursoActivo BIT;
+							EXEC spRecursoActivo @idRecurso,@recursoActivo OUTPUT;
+
+							IF @idRecurso = 0
+								BEGIN TRY
+									BEGIN TRANSACTION
+										
+										UPDATE Recursos
+											SET Recursos.activo = 1,
+												Recursos.fechaModificacion = CONVERT(NVARCHAR(15),GETDATE(),103)
+												WHERE Recursos.id = @idRecurso
+
+									COMMIT
+									RETURN 0
+									END TRY
+								BEGIN CATCH
+									IF @@TRANCOUNT > 0
+										ROLLBACK
+										RETURN -1*@@ERROR
+								END CATCH
+							ELSE
+								BEGIN
+									PRINT 'Recurso ya existe'
+									RETURN -1
+								END
 						END
+
 				END
 			ELSE
 				BEGIN
@@ -295,29 +249,74 @@ GO
 CREATE PROC spAgregarOportunidad 
 	@nombreASPInput NVARCHAR(64),
 	@nombreSitioInput NVARCHAR(64),
-	@nombreOportunidadInput NVARCHAR(32),
 	@descripcionInput NVARCHAR(512),
 	@observacionesInput NVARCHAR(1024) AS
 BEGIN
 	DECLARE @idASP INT;
 	EXEC spGetIDAsp @nombreASPInput,@idASP OUTPUT;
-	IF @idASP IS NOT NULL
+
+	DECLARE @ASPActivo BIT;
+	EXEC spASPActivo @idASP, @ASPActivo OUTPUT;
+
+	IF @idASP IS NOT NULL AND @ASPActivo = 1
 		BEGIN
+
 			DECLARE @idSitio INT;
 			EXEC spGetIDSitio @idASP,@nombreSitioInput,@idSitio OUTPUT;
-			IF @idSitio IS NOT NULL
+
+			DECLARE @sitioActivo BIT;
+			EXEC spSitioActivo @idSitio,@sitioActivo OUTPUT;
+
+			IF @idSitio IS NOT NULL AND @sitioActivo = 1
 				BEGIN
-					BEGIN TRY
-						BEGIN TRANSACTION
-							INSERT INTO Oportunidades(idSitio,nombre,descripcion,observaciones,fechaModificacion,activo)
-							VALUES (@idSitio,@nombreOportunidadInput,@descripcionInput,@observacionesInput,CONVERT(NVARCHAR(15),GETDATE(),103),1)
-						COMMIT
-					END TRY
-					BEGIN CATCH
-						IF @@TRANCOUNT > 0
-						ROLLBACK
-						RETURN -1*@@ERROR
-					END CATCH
+
+					DECLARE @idOportunidad INT;
+					DECLARE @lowDescripcion NVARCHAR(512);
+					EXEC spGetIDOportunidad @idASP,@descripcionInput,@idOportunidad OUTPUT;
+
+					IF @idOportunidad IS NULL
+						BEGIN
+							BEGIN TRY
+								BEGIN TRANSACTION
+									INSERT INTO Oportunidades(idSitio,descripcion,observaciones,fechaModificacion,activo)
+									VALUES (@idSitio,@descripcionInput,@observacionesInput,CONVERT(NVARCHAR(15),GETDATE(),103),1)
+								COMMIT
+								RETURN 0
+							END TRY
+							BEGIN CATCH
+								IF @@TRANCOUNT > 0
+									ROLLBACK
+									RETURN -1*@@ERROR
+							END CATCH
+						END
+					ELSE
+						BEGIN
+
+							DECLARE @oportunidadActiva BIT;
+							EXEC spOportunidadActivo @idOportunidad,@oportunidadActiva OUTPUT;
+
+							IF @oportunidadActiva = 0
+								BEGIN TRY
+									BEGIN TRANSACTION
+										
+										UPDATE Oportunidades
+										SET Oportunidades.activo = 1,
+											Oportunidades.fechaModificacion = CONVERT(NVARCHAR(15),GETDATE(),103)
+					
+									COMMIT
+									RETURN 0
+								END TRY
+								BEGIN CATCH
+									IF @@TRANCOUNT > 0
+										ROLLBACK
+										RETURN -1*@@ERROR
+								END CATCH
+							ELSE
+								BEGIN
+									PRINT 'Ya existe esa oportunidad'
+									RETURN -1
+								END
+						END
 				END	
 			ELSE
 				BEGIN

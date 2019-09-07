@@ -131,12 +131,11 @@ DROP TABLE IF EXISTS Oportunidades
 CREATE TABLE Oportunidades(
 	id INT IDENTITY(1,1) PRIMARY KEY,
 	idSitio INT NOT NULL,
-	nombre NVARCHAR(64) NOT NULL,
 	descripcion NVARCHAR(512) NOT NULL,
 	observaciones NVARCHAR(1024) NOT NULL, --Campo para riesgos y detalles importantes
 	fechaModificacion NVARCHAR(10) NOT NULL,
 	activo BIT NOT NULL,
-	FOREIGN KEY (idRecurso) REFERENCES Recursos(id)
+	FOREIGN KEY (idSitio) REFERENCES Sitios(id)
 )
 GO
 
@@ -154,7 +153,7 @@ CREATE TABLE Usuario(
 )
 GO
 
---Adicion de la cuenta administradora
+--Adicion de la cuenta administrador
 INSERT INTO Usuario(nombre,cedula,correo,usuario,contrasena,admin,activo) VALUES ('Administrador','123456789','admin@sinac.co.cr','admin','admin',1,1)
 GO
 
