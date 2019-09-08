@@ -1,5 +1,12 @@
 --Presione F5 para crear la base de datos junto con las tablas
 
+/*
+NOTAS:
+	+ En la aplicacion web, guardar las secciones como  [ASP > Sitio > Recurso/Oportunidad] para pasarlos como parametros
+	  en los stored procedures y no tener que buscar una manera de buscarlos, si no enviarlos directamente.Puede ser una lista estatica o incluso una pila.
+
+*/
+
 USE master
 GO
 

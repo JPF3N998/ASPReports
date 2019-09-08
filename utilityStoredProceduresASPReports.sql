@@ -42,7 +42,7 @@ DROP PROC IF EXISTS spGetIDTipoRecurso
 GO
 CREATE PROC spGetIDTipoRecurso @nombreTipoRecursoInput NVARCHAR(128), @idRecurso INT OUTPUT AS
 	BEGIN
-		SET @idRecurso = (SELECT TR.id FROM TipoRecurso TR WHERE TR.nombre LIKE @nombreTipoRecursoInput);
+		SET @idRecurso = (SELECT TR.id FROM TipoRecurso TR WHERE LOWER(TR.nombre) LIKE LOWER(@nombreTipoRecursoInput));
 		IF @idRecurso IS NOT NULL
 			BEGIN
 				RETURN 1;
@@ -241,7 +241,7 @@ GO
 
 CREATE PROC spGetIDAsp @nombreInput NVARCHAR(64),@idOutput INT OUTPUT AS
 BEGIN
-	SET @idOutput = (SELECT A.id FROM ASP A WHERE A.nombre = @nombreInput);
+	SET @idOutput = (SELECT A.id FROM ASP A WHERE LOWER(A.nombre) = LOWER(@nombreInput));
 END
 GO
 
@@ -251,7 +251,7 @@ GO
 
 CREATE PROC spGetIDSitio @idASP INT,@nombreSitio NVARCHAR(64),@idOutput INT OUTPUT AS
 BEGIN
-	SET @idOutput = (SELECT S.id FROM Sitios S WHERE S.idASP = @idASP AND S.nombre = @nombreSitio);
+	SET @idOutput = (SELECT S.id FROM Sitios S WHERE S.idASP = @idASP AND LOWER(S.nombre) = LOWER(@nombreSitio));
 END
 GO
 
@@ -270,7 +270,7 @@ GO
 
 CREATE PROC spGetIDRecurso @idSitio INT, @nombreRecurso NVARCHAR(64),@idOutput INT OUTPUT AS
 BEGIN
-	SET @idOutput = (SELECT R.id FROM Recursos R WHERE R.idSitio = @idSitio AND @nombreRecurso LIKE R.nombre);
+	SET @idOutput = (SELECT R.id FROM Recursos R WHERE R.idSitio = @idSitio AND LOWER(@nombreRecurso) LIKE LOWER(R.nombre));
 END
 GO
 
@@ -280,7 +280,7 @@ GO
 
 CREATE PROC spGetIDTipoFigura @nombreTipoFigura NVARCHAR(32),@idTipoFigura INT OUTPUT AS
 	BEGIN
-		SET @idTipoFigura = (SELECT TF.id FROM TipoFigura TF WHERE TF.nombre LIKE @nombreTipoFigura)
+		SET @idTipoFigura = (SELECT TF.id FROM TipoFigura TF WHERE LOWER(TF.nombre) LIKE LOWER(@nombreTipoFigura))
 		IF @idTipoFigura IS NULL
 			BEGIN
 				PRINT CONCAT('No existe figura ',@nombreTipoFigura)
