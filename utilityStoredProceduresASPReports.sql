@@ -2,11 +2,17 @@ USE ASPReports
 GO
 
 /* PROC para el login */
-DROP PROC IF EXISTS spLogin
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
 GO
 
-CREATE PROC spLogin @nombreUsuarioInput NVARCHAR(50), @passwordInput NVARCHAR(50),@adminBIT BIT OUTPUT AS
+DROP PROC IF EXISTS spLogin 
+GO
+CREATE PROC [dbo].[spLogin] @nombreUsuarioInput NVARCHAR(50), @passwordInput NVARCHAR(50)
+	AS
 	BEGIN
+	BEGIN TRY
 		DECLARE @existeUsuario NVARCHAR(50) = (SELECT U.usuario FROM Usuario U WHERE U.usuario = @nombreUsuarioInput);
 		IF (@existeUsuario IS NOT NULL) /* Revisa existencia de usuario */
 			BEGIN
@@ -16,13 +22,11 @@ CREATE PROC spLogin @nombreUsuarioInput NVARCHAR(50), @passwordInput NVARCHAR(50
 					BEGIN
 						IF @isAdmin = 1 
 							BEGIN
-								SET @adminBIT = 1;
 								RETURN 1 /*1 para admin*/
 							END
 						ELSE
 							BEGIN
-								SET @adminBIT = 0;
-								RETURN 0; /*2 para cliente*/
+								RETURN 2; /*2 para cliente*/
 							END
 					END
 				ELSE
@@ -34,8 +38,12 @@ CREATE PROC spLogin @nombreUsuarioInput NVARCHAR(50), @passwordInput NVARCHAR(50
 			BEGIN
 				RETURN 0;
 			END
-	END
-GO
+	END TRY
+	BEGIN CATCH
+		If @@TRANCOUNT>0 ROLLBACK
+			Return -1*@@ERROR
+	END CATCH
+END
 
 --PROC para sacar el ID del tipo de recurso usando el nombre
 DROP PROC IF EXISTS spGetIDTipoRecurso 
