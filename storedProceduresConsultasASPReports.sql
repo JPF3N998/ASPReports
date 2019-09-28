@@ -105,4 +105,111 @@ CREATE PROC spBuscarRecurso @nombreASPinput NVARCHAR(64),@nombreSitioInput NVARC
 	END
 GO
 
+--PROC para ver las puntuaciones de un recurso usando su nombre
 
+DROP PROC IF EXISTS spGetRatingCaracteristicasRecurso
+GO
+CREATE PROC spGetRatingCaracteristicasRecurso @nombreASPInput NVARCHAR(64),@nombreSitioInput NVARCHAR(64),@nombreRecursoInput NVARCHAR(128) AS
+	BEGIN
+		DECLARE @idASP INT;
+		EXEC spGetIDAsp @nombreASPInput,@idASP OUTPUT;
+
+		DECLARE @aspActivo BIT;
+		EXEC spASPActivo @idASP,@aspActivo OUTPUT;
+
+		IF @idASP IS NOT NULL AND @ASPactivo = 1
+			BEGIN
+				DECLARE @idSitio INT;
+				EXEC spGetIDSitio @idASP,@nombreSitioInput,@idSitio OUTPUT;
+
+				DECLARE @activoSitio BIT;
+				EXEC spSitioActivo @idSitio,@activoSitio OUTPUT;
+
+				IF @activoSitio = 1 AND @idSitio IS NOT NULL
+					BEGIN
+						
+						DECLARE @idRecurso INT;
+						EXEC spGetIDRecurso @idSitio,@nombreRecursoInput,@idRecurso OUTPUT;
+
+						DECLARE @activoRecurso BIT;
+						EXEC spRecursoActivo @idRecurso,@activoRecurso OUTPUT;
+
+						IF @idRecurso IS NOT NULL  AND @activoRecurso = 1
+							BEGIN
+								SELECT RR.relacionPropositoASP AS [Relacion con el ASP],RR.relacionTemaInterpretativoASP AS [Relacion con los temas interpretativos del ASP], RR.variedadRecurso AS [Variedad del recurso],RR.atractivo AS [Atractivo],RR.accesibilidad AS [Accesibilidad] FROM RatingRecurso RR WHERE @idRecurso = RR.idRecurso;
+							END
+						ELSE
+							BEGIN
+								PRINT 'Recurso no existe'
+								RETURN -1
+							END
+					END
+				ELSE
+					BEGIN
+						PRINT 'Sitio no existe'
+						RETURN -1
+					END
+			END
+		ELSE
+			BEGIN
+				PRINT 'No existe ese ASP'
+				RETURN -1;
+			END
+	END
+GO
+
+--EXEC spGetRatingCaracteristicasRecurso 'Volcan Irazu','Crater','Lago'
+
+DROP PROC IF EXISTS spGetFechaModificacionRecurso
+GO
+CREATE PROC spGetFechaModificacionRecurso @nombreASPInput NVARCHAR(64),@nombreSitioInput NVARCHAR(64),@nombreRecursoInput NVARCHAR(128),@ultimaFechaModificacion NVARCHAR(15) OUTPUT AS
+BEGIN
+		DECLARE @idASP INT;
+		EXEC spGetIDAsp @nombreASPInput,@idASP OUTPUT;
+
+		DECLARE @aspActivo BIT;
+		EXEC spASPActivo @idASP,@aspActivo OUTPUT;
+
+		IF @idASP IS NOT NULL AND @ASPactivo = 1
+			BEGIN
+				DECLARE @idSitio INT;
+				EXEC spGetIDSitio @idASP,@nombreSitioInput,@idSitio OUTPUT;
+
+				DECLARE @activoSitio BIT;
+				EXEC spSitioActivo @idSitio,@activoSitio OUTPUT;
+
+				IF @activoSitio = 1 AND @idSitio IS NOT NULL
+					BEGIN
+						
+						DECLARE @idRecurso INT;
+						EXEC spGetIDRecurso @idSitio,@nombreRecursoInput,@idRecurso OUTPUT;
+
+						DECLARE @activoRecurso BIT;
+						EXEC spRecursoActivo @idRecurso,@activoRecurso OUTPUT;
+
+						IF @idRecurso IS NOT NULL  AND @activoRecurso = 1
+							SET @ultimaFechaModificacion = (SELECT R.fechaModificacion FROM Recursos R WHERE R.id = @idRecurso)
+						ELSE
+							BEGIN
+								PRINT 'Recurso no existe'
+								RETURN -1
+							END
+					END
+				ELSE
+					BEGIN
+						PRINT 'Sitio no existe'
+						RETURN -1
+					END
+			END
+		ELSE
+			BEGIN
+				PRINT 'No existe ese ASP'
+				RETURN -1;
+			END
+	END
+GO
+/*
+DECLARE @fecha NVARCHAR(15)
+EXEC spGetFechaModificacionRecurso 'Volcan Irazu','Crater','Lago',@fecha OUT
+PRINT @fecha
+*/

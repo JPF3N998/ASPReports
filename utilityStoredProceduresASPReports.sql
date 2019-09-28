@@ -31,11 +31,13 @@ CREATE PROC [dbo].[spLogin] @nombreUsuarioInput NVARCHAR(50), @passwordInput NVA
 					END
 				ELSE
 					BEGIN
+						SET @adminBIT = -1;
 						RETURN -1;
 					END
 			END
 		ELSE
 			BEGIN
+				SET @adminBIT = -1;
 				RETURN 0;
 			END
 	END TRY
@@ -99,6 +101,7 @@ BEGIN
 											AtributosRecurso.importanciaSPTI = @rImportanciaSPTI,
 											AtributosRecurso.fechaModificacion = CONVERT(NVARCHAR(15),GETDATE(),103)
 										WHERE @idRecurso = AtributosRecurso.idRecurso
+										EXEC spActualizarValoracion @nombreASPInput,@nombreSitioInput
 								COMMIT
 							END TRY
 							BEGIN CATCH
@@ -145,7 +148,7 @@ BEGIN
 	IF @idASP IS NOT NULL
 		BEGIN
 			DECLARE @idSitio INT;
-			EXEC spGetIDSitio @idASP,@nombreASPInput,@idSitio OUTPUT;
+			EXEC spGetIDSitio @idASP,@nombreSitioInput,@idSitio OUTPUT;
 			IF @idSitio IS NOT NULL
 				BEGIN
 					DECLARE @idRecurso INT;
@@ -162,6 +165,7 @@ BEGIN
 											RatingRecurso.accesibilidad = @rAccesibildad,
 											RatingRecurso.fechaModificacion = CONVERT(NVARCHAR(15),GETDATE(),103)
 										WHERE @idRecurso = RatingRecurso.idRecurso
+									exec spActualizarValoracion @nombreASPInput,@nombreSitioInput
 								COMMIT
 							END TRY
 							BEGIN CATCH
@@ -188,8 +192,7 @@ BEGIN
 			RETURN -1
 		END
 END
-GO
-
+GO``
 
 --PROC para el calculo de la valoracion(promedio) de un sitio
 DROP PROC IF EXISTS spActualizarValoracion
@@ -206,7 +209,7 @@ BEGIN
 				BEGIN
 					DECLARE @temp TABLE(promRP FLOAT,promRTI FLOAT,promVR FLOAT,promA FLOAT,promAcc FLOAT)
 
-					--EXEC spActualizarValoracion 'Volcan Irazu','Crater'
+					
 					INSERT INTO @temp(promRP,promRTI,promVR,promA,promAcc)
 					SELECT AVG(CAST(RR.relacionPropositoASP AS FLOAT)) AS promRP, AVG(CAST(RR.relacionTemaInterpretativoASP AS FLOAT)) AS promRTI, AVG(CAST(RR.variedadRecurso AS FLOAT)) AS promVR,AVG(CAST(RR.atractivo AS FLOAT)) as promA, AVG(CAST(RR.accesibilidad AS FLOAT)) AS promAcc
 					FROM (RatingRecurso RR JOIN Recursos R ON RR.idRecurso=R.id) JOIN Sitios S ON R.idSitio=S.id WHERE S.id = @idSitio
