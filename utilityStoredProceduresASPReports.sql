@@ -31,13 +31,11 @@ CREATE PROC [dbo].[spLogin] @nombreUsuarioInput NVARCHAR(50), @passwordInput NVA
 					END
 				ELSE
 					BEGIN
-						SET @adminBIT = -1;
 						RETURN -1;
 					END
 			END
 		ELSE
 			BEGIN
-				SET @adminBIT = -1;
 				RETURN 0;
 			END
 	END TRY
@@ -46,7 +44,7 @@ CREATE PROC [dbo].[spLogin] @nombreUsuarioInput NVARCHAR(50), @passwordInput NVA
 			Return -1*@@ERROR
 	END CATCH
 END
-
+GO
 --PROC para sacar el ID del tipo de recurso usando el nombre
 DROP PROC IF EXISTS spGetIDTipoRecurso 
 GO
@@ -166,7 +164,7 @@ BEGIN
 											RatingRecurso.variedadRecurso = @rVariedadRecurso,
 											RatingRecurso.atractivo = @rAtractivo,
 											RatingRecurso.accesibilidad = @rAccesibildad,
-											RatingRecurso.fechaModificacion = CONVERT(NVARCHAR(15),GETDATE(),103)
+											RatingRecurso.fechaModificacion = CONVERT(NVARCHAR(15),GETDATE(),103),
 											RatingRecurso.responsable = @responsableInput
 										WHERE @idRecurso = RatingRecurso.idRecurso
 									exec spActualizarValoracion @nombreASPInput,@nombreSitioInput
@@ -196,7 +194,7 @@ BEGIN
 			RETURN -1
 		END
 END
-GO``
+GO
 
 --PROC para el calculo de la valoracion(promedio) de un sitio
 DROP PROC IF EXISTS spActualizarValoracion

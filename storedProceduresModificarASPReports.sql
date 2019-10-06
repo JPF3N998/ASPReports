@@ -11,8 +11,6 @@ CREATE PROC spModificarSitio
 	@nombreSitioInput NVARCHAR(64),
 	@ubicacionInput NVARCHAR(256),
 	@nombreTipoFigura NVARCHAR(32),
-	@convenienciaInput NVARCHAR(512),
-	@calidadInput NVARCHAR(512),
 	@tamanoInput NVARCHAR(512),
 	@capacidadInput NVARCHAR(128),
 	@observacionesDisenoInfraestructuraInput NVARCHAR(1024),
@@ -36,13 +34,11 @@ CREATE PROC spModificarSitio
 									Sitios.nombre = @nombreSitioInput,
 									Sitios.ubicacion = @ubicacionInput,
 									Sitios.idTipoFigura = @idTipoFigura,
-									Sitios.conveniencia = @convenienciaInput,
-									Sitios.calidad = @calidadInput,
-									Sitios.tamano = @calidadInput,
+									Sitios.tamano = @tamanoInput,
 									Sitios.capacidad = @capacidadInput,
 									Sitios.observacionesDisenoInfraestructura = @observacionesDisenoInfraestructuraInput,
-									Sitios.fechaCreacion = CONVERT(NVARCHAR(15),GETDATE(),103)
-									Sitios.responsable = @responsableInput,
+									Sitios.fechaCreacion = CONVERT(NVARCHAR(15),GETDATE(),103),
+									Sitios.responsable = @responsableInput
 									WHERE Sitios.id = @idSitio
 							COMMIT
 						END TRY

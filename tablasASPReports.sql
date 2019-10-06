@@ -36,6 +36,7 @@ GO
 
 --Creacion de la tabla de sitios
 DROP TABLE IF EXISTS Sitios
+GO
 CREATE TABLE Sitios(
 	id INT IDENTITY(1,1) PRIMARY KEY,
 	idASP INT NOT NULL,
@@ -43,8 +44,6 @@ CREATE TABLE Sitios(
 	nombre NVARCHAR(64) NOT NULL,
 	ubicacion NVARCHAR(256) NOT NULL,
 	zonificacion BIT NOT NULL,
-	conveniencia NVARCHAR(512) NOT NULL,
-	calidad NVARCHAR(512) NOT NULL,
 	tamano NVARCHAR(512) NOT NULL,
 	capacidad NVARCHAR(128) NOT NULL,
 	observacionesDisenoInfraestructura NVARCHAR(1024),
@@ -63,6 +62,7 @@ GO
 
 --Punto b, pagina 12 de la herramienta del SINAC
 DROP TABLE IF EXISTS TipoRecurso
+GO
 CREATE TABLE TipoRecurso(
 	id INT IDENTITY(1,1) PRIMARY KEY,
 	nombre NVARCHAR(128) NOT NULL,
@@ -83,6 +83,7 @@ GO
 	e importanciaSPTI vienen en el cuadro 2 de la herramienta del SINAC
 **/
 DROP TABLE IF EXISTS Recursos
+GO
 CREATE TABLE Recursos(
 	id INT IDENTITY(1,1) PRIMARY KEY,
 	idTipoRecurso INT NOT NULL,
@@ -98,6 +99,7 @@ GO
 
 --Atributos para el rating de los recursos
 DROP TABLE IF EXISTS RatingRecurso
+GO
 CREATE TABLE RatingRecurso(
 	id INT IDENTITY(1,1) PRIMARY KEY,
 	idRecurso INT NOT NULL,
@@ -114,6 +116,7 @@ GO
 
 --Atributos para recurso
 DROP TABLE IF EXISTS AtributosRecurso
+GO
 CREATE TABLE AtributosRecurso(
 	id INT IDENTITY(1,1) PRIMARY KEY,
 	idRecurso INT NOT NULL,
@@ -131,6 +134,7 @@ GO
 
 --Creacion de la tabla de Oportunidades
 DROP TABLE IF EXISTS Oportunidades
+GO
 CREATE TABLE Oportunidades(
 	id INT IDENTITY(1,1) PRIMARY KEY,
 	idSitio INT NOT NULL,
@@ -145,6 +149,7 @@ GO
 
 --Creacion de la tablas para usuarios
 DROP TABLE IF EXISTS Usuario
+GO
 CREATE TABLE Usuario(
 	id INT PRIMARY KEY IDENTITY(1,1),
 	nombre NVARCHAR(50) NOT NULL,
@@ -158,9 +163,9 @@ CREATE TABLE Usuario(
 GO
 
 --Adicion de la cuenta administrador
-INSERT INTO Usuario(nombre,cedula,correo,usuario,contrasena,admin,activo) VALUES ('Administrador','123456789','admin@sinac.co.cr','admin','admin',1,1)
+/*INSERT INTO Usuario(nombre,cedula,correo,usuario,contrasena,admin,activo) VALUES ('Administrador','123456789','admin@sinac.co.cr','admin','admin',1,1)
 INSERT INTO Usuario(nombre,cedula,correo,usuario,contrasena,admin,activo) VALUES ('Nacho','987654321','nacho@sinac.co.cr','admin','admin',0,1)
-GO
+GO*/
 
 --Notas
 /**
