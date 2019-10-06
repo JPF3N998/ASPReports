@@ -89,8 +89,17 @@ CREATE TABLE Recursos(
 	idTipoRecurso INT NOT NULL,
 	idSitio INT NOT NULL,
 	nombre NVARCHAR(128) NOT NULL,
-	fechaModificacion NVARCHAR(10) NOT NULL,
+	ubicacion NVARCHAR(200) NOT NULL,
+	anomalia NVARCHAR(200) NOT NULL,
+	traslape NVARCHAR(200) NOT NULL,
+	condicion NVARCHAR(200) NOT NULL,
+	atractivos NVARCHAR(200) NOT NULL,
+	soportaUso BIT NOT NULL,
+	capacidad NVARCHAR(200) NOT NULL,
+	hectareas NVARCHAR(200) NOT NULL,
+	oportunidadesUso NVARCHAR(200) NOT NULL,
 	responsable NVARCHAR(256) NOT NULL,
+	fechaModificacion NVARCHAR(10) NOT NULL,
 	activo BIT NOT NULL,
 	FOREIGN KEY (idTipoRecurso) REFERENCES TipoRecurso(id),
 	FOREIGN KEY (idSitio) REFERENCES Sitios(id)
@@ -113,24 +122,6 @@ CREATE TABLE RatingRecurso(
 	FOREIGN KEY (idRecurso) REFERENCES Recursos(id)
 )
 GO
-
---Atributos para recurso
-DROP TABLE IF EXISTS AtributosRecurso
-GO
-CREATE TABLE AtributosRecurso(
-	id INT IDENTITY(1,1) PRIMARY KEY,
-	idRecurso INT NOT NULL,
-	disponibilidad INT NOT NULL, 
-	capacidadAbsorcionUsoTuristico INT NOT NULL,
-	capacidadTolerarUsoTuristico INT NOT NULL,
-	interesPotencialAvisitantes INT NOT NULL,
-	importanciaSPTI INT NOT NULL, --importancia relativa Significado, el Proposito y los temas Interpretativos del sitio
-	fechaModificacion NVARCHAR(10) NOT NULL,
-	responsable NVARCHAR(256) NOT NULL,
-	FOREIGN KEY (idRecurso) REFERENCES Recursos(id)
-)
-GO
-
 
 --Creacion de la tabla de Oportunidades
 DROP TABLE IF EXISTS Oportunidades

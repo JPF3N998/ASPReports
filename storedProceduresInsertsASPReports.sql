@@ -138,19 +138,22 @@ CREATE PROC spAgregarRecurso
 	@nombreSitioInput NVARCHAR(64),
 	@nombreTipoRecursoInput NVARCHAR(64),
 	@nombreRecursoInput NVARCHAR(128),
-	@responsableInput NVARCHAR(256),
-	--Rating de atributos del recurso puntajes de 1-5
-	@rDisponibilidad INT,
-	@rCapacidadAbsorcionUsoTuristico INT,
-	@rCapacidadTolerarUsoTuristico INT,
-	@rInteresPotencialAvisitantes INT,
-	@rImportanciaSPTI INT,
+	@ubicacionInput NVARCHAR(200) ,
+	@anomaliaInput NVARCHAR(200) ,
+	@traslapeInput NVARCHAR(200) ,
+	@condicionInput NVARCHAR(200) ,
+	@atractivosInput NVARCHAR(200) ,
+	@soportaUsoInput BIT,
+	@capacidadInput NVARCHAR(200) ,
+	@hectareasInput NVARCHAR(200),
+	@oportunidadesUsoInput NVARCHAR(200),
 	--Rating de recurso puntajes de 1-3
 	@rRelacionPropositoASP INT,
 	@rRelacionTemaInterpretativoASP INT,
 	@rVariedadRecurso INT,
 	@rAtractivo INT,
-	@rAccesibildad INT AS
+	@rAccesibildad INT,
+	@responsableInput NVARCHAR(256) AS
 
 BEGIN
 	DECLARE @idASP INT;
@@ -180,14 +183,11 @@ BEGIN
 								EXEC spGetIDTipoRecurso @nombreTipoRecursoInput,@idTipoRecurso OUTPUT;
 								BEGIN TRANSACTION
 
-									INSERT INTO Recursos(idTipoRecurso,idSitio,nombre,fechaModificacion,responsable,activo) VALUES (@idTipoRecurso,@idSitio,@nombreRecursoInput,CONVERT(NVARCHAR(15),GETDATE(),103),@responsableInput,1)
+									INSERT INTO Recursos(idTipoRecurso,idSitio,nombre,ubicacion,anomalia,traslape,condicion,atractivos,soportaUso,capacidad,hectareas,oportunidadesUso,responsable,fechaModificacion,activo)
+									VALUES (@idTipoRecurso,@idSitio,@nombreRecursoInput,@ubicacionInput,@anomaliaInput,@traslapeInput,@condicionInput,@atractivosInput,@soportaUsoInput,@capacidadInput,@hectareasInput,@oportunidadesUsoInput,@responsableInput,CONVERT(NVARCHAR(15),GETDATE(),103),1)
 									
-
 									INSERT INTO RatingRecurso(idRecurso,relacionPropositoASP,relacionTemaInterpretativoASP,variedadRecurso,atractivo,accesibilidad,fechaModificacion,responsable)
 									SELECT SCOPE_IDENTITY() as idRecurso,@rRelacionPropositoASP,@rRelacionTemaInterpretativoASP,@rVariedadRecurso,@rAtractivo,@rAccesibildad,CONVERT(NVARCHAR(15),GETDATE(),103),@responsableInput FROM Recursos
-									
-									INSERT INTO AtributosRecurso(idRecurso,disponibilidad,capacidadAbsorcionUsoTuristico,capacidadTolerarUsoTuristico,interesPotencialAvisitantes,importanciaSPTI,fechaModificacion,responsable)
-									SELECT SCOPE_IDENTITY() as idRecurso,@rDisponibilidad,@rCapacidadAbsorcionUsoTuristico,@rCapacidadTolerarUsoTuristico,@rInteresPotencialAvisitantes,@rImportanciaSPTI,CONVERT(NVARCHAR(15),GETDATE(),103),@responsableInput FROM Recursos
 									
 									EXEC spActualizarValoracion @nombreASPInput, @nombreSitioInput
 									
@@ -215,7 +215,7 @@ BEGIN
 												Recursos.fechaModificacion = CONVERT(NVARCHAR(15),GETDATE(),103),
 												Recursos.responsable = @responsableInput
 												WHERE Recursos.id = @idRecurso
-
+										
 									COMMIT
 									RETURN 0
 									END TRY

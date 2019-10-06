@@ -34,7 +34,7 @@ CREATE PROC spBuscarSitio @nombreASPInput NVARCHAR(64),@nombreSitioInput NVARCHA
 			BEGIN
 				SELECT S.nombre AS [Nombre del sitio],S.ubicacion AS [Ubicacion],
 				CASE WHEN S.zonificacion = 1 THEN 'Si' ELSE 'No' END AS [Zonificacion],
-				(SELECT TF.nombre FROM Sitios S JOIN TipoFigura TF ON S.idTipoFigura = TF.id) AS [Forma del sitio],
+				(SELECT TF.nombre FROM TipoFigura TF WHERE TF.id = S.idTipoFigura) AS [Forma del sitio],
 				S.valoracionRelacionPropositoASP AS [Relacion con el proposito del ASP],
 				S.valoracionRelacionTemasInterpretativos AS [Relacion con temas interpretativos del ASP],
 				S.valoracionVariedadRecurso AS [Variedad de los recursos],
@@ -48,7 +48,7 @@ CREATE PROC spBuscarSitio @nombreASPInput NVARCHAR(64),@nombreSitioInput NVARCHA
 			BEGIN
 				SELECT S.nombre AS [Nombre del sitio],S.ubicacion AS [Ubicacion],
 				CASE WHEN S.zonificacion = 1 THEN 'Si' ELSE 'No' END AS [Zonificacion],
-				(SELECT TF.nombre FROM Sitios S JOIN TipoFigura TF ON S.idTipoFigura = TF.id) AS [Forma del sitio],
+				(SELECT TF.nombre FROM TipoFigura TF WHERE TF.id = S.idTipoFigura) AS [Forma del sitio],
 				S.valoracionRelacionPropositoASP AS [Relacion con el proposito del ASP],
 				S.valoracionRelacionTemasInterpretativos AS [Relacion con temas interpretativos del ASP],
 				S.valoracionVariedadRecurso AS [Variedad de los recursos],
@@ -60,6 +60,8 @@ CREATE PROC spBuscarSitio @nombreASPInput NVARCHAR(64),@nombreSitioInput NVARCHA
 			END
 	END
 GO
+
+--EXEC spBuscarSitio 'Volcan Irazu', '*'
 
 --PROC para buscar un recurso por nombre en un sitio
 DROP PROC IF EXISTS spBuscarRecurso
@@ -87,11 +89,37 @@ CREATE PROC spBuscarRecurso @nombreASPinput NVARCHAR(64),@nombreSitioInput NVARC
 						
 						IF @nombreRecursoInput LIKE '*'
 							BEGIN
-								SELECT R.nombre AS [Nombre de recurso],TR.nombre AS [Tipo de recurso],R.fechaModificacion AS [Ultima modificacion],R.responsable AS [Responsable] FROM Recursos R JOIN TipoRecurso TR ON R.idTipoRecurso = TR.id WHERE R.activo = 1  AND @idSitio = R.idSitio
+								SELECT R.nombre AS [Nombre de recurso],
+								TR.nombre AS [Tipo de recurso],
+								R.ubicacion AS [Ubicacion] ,
+								R.anomalia AS [Anomalia],
+								R.traslape AS [Traslape],
+								R.condicion AS [Condicion],
+								R.atractivos AS [Atractivos],
+								R.soportaUso AS [Soporta uso?],
+								R.capacidad AS [Capacidad],
+								R.hectareas AS [Hectareas],
+								R.oportunidadesUso AS [Oportunidades de uso],
+								R.fechaModificacion AS [Ultima modificacion],
+								R.responsable AS [Responsable] 
+								FROM Recursos R JOIN TipoRecurso TR ON R.idTipoRecurso = TR.id WHERE R.activo = 1  AND @idSitio = R.idSitio
 							END
 						ELSE
 							BEGIN
-								SELECT R.nombre AS [Nombre de recurso],TR.nombre AS [Tipo de recurso],R.fechaModificacion AS [Ultima modificacion],R.responsable AS [Responsable] FROM Recursos R JOIN TipoRecurso TR ON R.idTipoRecurso = TR.id WHERE R.activo = 1 AND LOWER(R.nombre) LIKE LOWER(@nombreRecursoInput)  AND @idSitio = R.idSitio
+								SELECT R.nombre AS [Nombre de recurso],
+								TR.nombre AS [Tipo de recurso],
+								R.ubicacion AS [Ubicacion] ,
+								R.anomalia AS [Anomalia],
+								R.traslape AS [Traslape],
+								R.condicion AS [Condicion],
+								R.atractivos AS [Atractivos],
+								R.soportaUso AS [Soporta uso?],
+								R.capacidad AS [Capacidad],
+								R.hectareas AS [Hectareas],
+								R.oportunidadesUso AS [Oportunidades de uso],
+								R.fechaModificacion AS [Ultima modificacion],
+								R.responsable AS [Responsable]
+								FROM Recursos R JOIN TipoRecurso TR ON R.idTipoRecurso = TR.id WHERE R.activo = 1 AND LOWER(R.nombre) LIKE LOWER(@nombreRecursoInput)  AND @idSitio = R.idSitio
 							END
 
 					END

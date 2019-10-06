@@ -78,73 +78,6 @@ CREATE PROC spGetIDTipoRecurso @nombreTipoRecursoInput NVARCHAR(128), @idRecurso
 	END
 GO
 
---PROC para agregar los ratings a los atributos de recurso
-
-DROP PROC IF EXISTS spActualizarRatingAtributos
-GO
-CREATE PROC spActualizarRatingAtributos 
-	@nombreASPInput NVARCHAR(64),
-	@nombreSitioInput NVARCHAR(64),
-	@nombreRecursoInput NVARCHAR(128),
-	@rDisponibilidad INT,
-	@rCapacidadAbsorcionUsoTuristico INT,
-	@rCapacidadTolerarUsoTuristico INT,
-	@rInteresPotencialAvisitantes INT,
-	@rImportanciaSPTI INT,
-	@responsableInput NVARCHAR(256) AS
-BEGIN
-	DECLARE @idASP INT;
-	EXEC spGetIDAsp @nombreASPInput,@idASP OUTPUT;
-	IF @idASP IS NOT NULL
-		BEGIN
-			DECLARE @idSitio INT;
-			EXEC spGetIDSitio @idASP,@nombreASPInput,@idSitio OUTPUT;
-			IF @idSitio IS NOT NULL
-				BEGIN
-					DECLARE @idRecurso INT;
-					EXEC spGetIDRecurso @idSitio, @nombreRecursoInput,@idRecurso OUTPUT;
-					IF @idRecurso IS NOT NULL
-						BEGIN
-							BEGIN TRY
-								BEGIN TRANSACTION
-									UPDATE AtributosRecurso
-										SET AtributosRecurso.disponibilidad = @rDisponibilidad,
-											AtributosRecurso.capacidadAbsorcionUsoTuristico  = @rCapacidadAbsorcionUsoTuristico,
-											AtributosRecurso.capacidadTolerarUsoTuristico = @rCapacidadTolerarUsoTuristico,
-											AtributosRecurso.interesPotencialAvisitantes = @rInteresPotencialAvisitantes,
-											AtributosRecurso.importanciaSPTI = @rImportanciaSPTI,
-											AtributosRecurso.fechaModificacion = CONVERT(NVARCHAR(15),GETDATE(),103),
-											AtributosRecurso.responsable = @responsableInput
-										WHERE @idRecurso = AtributosRecurso.idRecurso
-										EXEC spActualizarValoracion @nombreASPInput,@nombreSitioInput
-								COMMIT
-							END TRY
-							BEGIN CATCH
-								IF @@TRANCOUNT > 0
-									ROLLBACK
-									RETURN -1*@@ERROR
-							END CATCH
-						END
-					ELSE
-						BEGIN
-							PRINT 'Recurso no existe'
-							RETURN -1
-						END
-				END
-			ELSE
-				BEGIN
-					PRINT 'No existe ese sitio'
-					RETURN -1
-				END
-		END
-	ELSE
-		BEGIN
-			PRINT 'No existe ese ASP'
-			RETURN -1
-		END
-END
-GO
-
 --PROC para actualizar los ratings de un recurso
 DROP PROC IF EXISTS spActualizarRatingRecurso
 GO
@@ -153,7 +86,7 @@ CREATE PROC spActualizarRatingRecurso
 	@nombreSitioInput NVARCHAR(64),
 	@nombreRecursoInput NVARCHAR(128),
 	@rRelacionPropositoASP INT,
-	@rRelacionTemaInterpretativoASP INT,
+	@rRelacionTemaInterpretativoASP INT,1
 	@rVariedadRecurso INT,
 	@rAtractivo INT,
 	@rAccesibildad INT,

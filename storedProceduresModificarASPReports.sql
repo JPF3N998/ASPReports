@@ -70,19 +70,22 @@ CREATE PROC spModificarRecurso
 	@nombreSitioInput NVARCHAR(64),
 	@nombreTipoRecursoInput NVARCHAR(64),
 	@nombreRecursoInput NVARCHAR(128),
-	@responsableInput NVARCHAR(256),
-	--Rating de atributos del recurso puntajes de 1-5
-	@rDisponibilidad INT,
-	@rCapacidadAbsorcionUsoTuristico INT,
-	@rCapacidadTolerarUsoTuristico INT,
-	@rInteresPotencialAvisitantes INT,
-	@rImportanciaSPTI INT,
+	@ubicacionInput NVARCHAR(200) ,
+	@anomaliaInput NVARCHAR(200) ,
+	@traslapeInput NVARCHAR(200) ,
+	@condicionInput NVARCHAR(200) ,
+	@atractivosInput NVARCHAR(200) ,
+	@soportaUsoInput BIT,
+	@capacidadInput NVARCHAR(200) ,
+	@hectareasInput NVARCHAR(200),
+	@oportunidadesUsoInput NVARCHAR(200),
 	--Rating de recurso puntajes de 1-3
 	@rRelacionPropositoASP INT,
 	@rRelacionTemaInterpretativoASP INT,
 	@rVariedadRecurso INT,
 	@rAtractivo INT,
-	@rAccesibildad INT AS
+	@rAccesibildad INT,
+	@responsableInput NVARCHAR(256) AS
 	BEGIN
 		DECLARE @idASP INT;
 	EXEC spGetIDAsp @nombreASPInput,@idASP OUTPUT;
@@ -105,11 +108,18 @@ CREATE PROC spModificarRecurso
 										SET Recursos.idTipoRecurso = @idTipoRecurso,
 											Recursos.idSitio = @idSitio,
 											Recursos.nombre = @nombreRecursoInput,
+											Recursos.ubicacion = @ubicacionInput,
+											Recursos.anomalia = @anomaliaInput,
+											Recursos.traslape = @traslapeInput,
+											Recursos.condicion = @condicionInput,
+											Recursos.atractivos = @atractivosInput,
+											Recursos.soportaUso = @soportaUsoInput,
+											Recursos.capacidad = @capacidadInput,
+											Recursos.hectareas = @hectareasInput,
+											Recursos.oportunidadesUso = @oportunidadesUsoInput,
 											Recursos.fechaModificacion = CONVERT(NVARCHAR(15),GETDATE(),103),
 											Recursos.responsable = @responsableInput
 										WHERE Recursos.id = @idRecurso
-
-									EXEC spActualizarRatingAtributos @nombreASPInput,@nombreSitioInput,@nombreRecursoInput,@rDisponibilidad,@rCapacidadAbsorcionUsoTuristico,@rCapacidadTolerarUsoTuristico,@rInteresPotencialAvisitantes,@rImportanciaSPTI,@responsableInput
 
 									EXEC spActualizarRatingRecurso @nombreASPInput,@nombreSitioInput,@nombreRecursoInput ,@rRelacionPropositoASP,@rRelacionTemaInterpretativoASP ,@rVariedadRecurso,@rAtractivo,@rAccesibildad,@responsableInput
 
