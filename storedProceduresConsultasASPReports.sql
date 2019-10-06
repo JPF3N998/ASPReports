@@ -164,6 +164,8 @@ GO
 
 --EXEC spGetRatingCaracteristicasRecurso 'Volcan Irazu','Crater','Lago'
 
+
+--PROC que retorna la ultima fecha de modifciacoin de un recurso
 DROP PROC IF EXISTS spGetFechaModificacionRecurso
 GO
 CREATE PROC spGetFechaModificacionRecurso @nombreASPInput NVARCHAR(64),@nombreSitioInput NVARCHAR(64),@nombreRecursoInput NVARCHAR(128),@ultimaFechaModificacion NVARCHAR(15) OUTPUT AS

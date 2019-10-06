@@ -270,14 +270,14 @@ BEGIN
 
 			DECLARE @sitioActivo BIT;
 			EXEC spSitioActivo @idSitio,@sitioActivo OUTPUT;
+			
+			
 
 			IF @idSitio IS NOT NULL AND @sitioActivo = 1
 				BEGIN
 
 					DECLARE @idOportunidad INT;
-					DECLARE @lowDescripcion NVARCHAR(512);
-					EXEC spGetIDOportunidad @idASP,@descripcionInput,@idOportunidad OUTPUT;
-
+					EXEC spGetIDOportunidad @idASP,@idSitio,@descripcionInput,@idOportunidad OUTPUT;
 					IF @idOportunidad IS NULL
 						BEGIN
 							BEGIN TRY

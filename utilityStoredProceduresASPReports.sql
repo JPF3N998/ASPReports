@@ -286,9 +286,9 @@ GO
 --PROC para traer el ID de oportunidad a partir de la descripcion de oportunidad
 DROP PROC IF EXISTS spGetIdOportunidad
 GO
-CREATE PROC spGetIDOportunidad @idASP INT,@descripcionOportunidad NVARCHAR(512),@idOutput INT OUTPUT AS
+CREATE PROC spGetIDOportunidad @idASP INT,@idSitio INT,@descripcionOportunidad NVARCHAR(512),@idOutput INT OUTPUT AS
 BEGIN
-	SET @idOutput = (SELECT O.id FROM Oportunidades O WHERE LOWER(O.descripcion) = LOWER(@descripcionOportunidad));
+	SET @idOutput = (SELECT O.id FROM Oportunidades O JOIN (Sitios S JOIN ASP A ON S.idASP = A.id) ON S.id = O.idSitio  WHERE @idASP = A.id AND S.id = @idSitio AND LOWER(O.descripcion) = LOWER(@descripcionOportunidad));
 END
 GO
 
