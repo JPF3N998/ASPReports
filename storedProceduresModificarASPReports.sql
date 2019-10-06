@@ -15,7 +15,8 @@ CREATE PROC spModificarSitio
 	@calidadInput NVARCHAR(512),
 	@tamanoInput NVARCHAR(512),
 	@capacidadInput NVARCHAR(128),
-	@observacionesDisenoInfraestructuraInput NVARCHAR(1024) AS
+	@observacionesDisenoInfraestructuraInput NVARCHAR(1024),
+	@responsableInput NVARCHAR(256) AS
 	BEGIN
 		DECLARE @idASP INT;
 		EXEC spGetIDAsp @nombreASPInput,@idASP OUTPUT;
@@ -41,6 +42,7 @@ CREATE PROC spModificarSitio
 									Sitios.capacidad = @capacidadInput,
 									Sitios.observacionesDisenoInfraestructura = @observacionesDisenoInfraestructuraInput,
 									Sitios.fechaCreacion = CONVERT(NVARCHAR(15),GETDATE(),103)
+									Sitios.responsable = @responsableInput,
 									WHERE Sitios.id = @idSitio
 							COMMIT
 						END TRY
@@ -72,6 +74,7 @@ CREATE PROC spModificarRecurso
 	@nombreSitioInput NVARCHAR(64),
 	@nombreTipoRecursoInput NVARCHAR(64),
 	@nombreRecursoInput NVARCHAR(128),
+	@responsableInput NVARCHAR(256),
 	--Rating de atributos del recurso puntajes de 1-5
 	@rDisponibilidad INT,
 	@rCapacidadAbsorcionUsoTuristico INT,
@@ -106,12 +109,13 @@ CREATE PROC spModificarRecurso
 										SET Recursos.idTipoRecurso = @idTipoRecurso,
 											Recursos.idSitio = @idSitio,
 											Recursos.nombre = @nombreRecursoInput,
-											Recursos.fechaModificacion = CONVERT(NVARCHAR(15),GETDATE(),103)
+											Recursos.fechaModificacion = CONVERT(NVARCHAR(15),GETDATE(),103),
+											Recursos.responsable = @responsableInput
 										WHERE Recursos.id = @idRecurso
 
-									EXEC spActualizarRatingAtributos @nombreASPInput,@nombreSitioInput,@nombreRecursoInput,@rDisponibilidad,@rCapacidadAbsorcionUsoTuristico,@rCapacidadTolerarUsoTuristico,@rInteresPotencialAvisitantes,@rImportanciaSPTI
+									EXEC spActualizarRatingAtributos @nombreASPInput,@nombreSitioInput,@nombreRecursoInput,@rDisponibilidad,@rCapacidadAbsorcionUsoTuristico,@rCapacidadTolerarUsoTuristico,@rInteresPotencialAvisitantes,@rImportanciaSPTI,@responsableInput
 
-									EXEC spActualizarRatingRecurso @nombreASPInput,@nombreSitioInput,@nombreRecursoInput ,@rRelacionPropositoASP,@rRelacionTemaInterpretativoASP ,@rVariedadRecurso,@rAtractivo,@rAccesibildad
+									EXEC spActualizarRatingRecurso @nombreASPInput,@nombreSitioInput,@nombreRecursoInput ,@rRelacionPropositoASP,@rRelacionTemaInterpretativoASP ,@rVariedadRecurso,@rAtractivo,@rAccesibildad,@responsableInput
 
 									EXEC spActualizarValoracion @nombreASPInput, @nombreSitioInput
 									
@@ -152,7 +156,8 @@ CREATE PROC spModificarOportunidad
 	@nombreRecursoInput NVARCHAR(128),
 	@nombreOportunidadInput NVARCHAR(32),
 	@descripcionInput NVARCHAR(512),
-	@observacionesInput NVARCHAR(1024) AS
+	@observacionesInput NVARCHAR(1024),
+	@responsableInput NVARCHAR(256) AS
 	
 	BEGIN
 		DECLARE @idASP INT;
@@ -162,32 +167,21 @@ CREATE PROC spModificarOportunidad
 			DECLARE @idSitio INT;
 			EXEC spGetIDSitio @idASP,@nombreSitioInput,@idSitio OUTPUT;
 			IF @idSitio IS NULL
-				BEGIN
-					DECLARE @idRecurso INT;
-					EXEC spGetIDRecurso @idSitio,@nombreRecursoInput,@idRecurso OUTPUT;
-					IF @idRecurso IS NOT NULL
-						BEGIN
-							BEGIN TRY
-								BEGIN TRANSACTION
-									UPDATE Oportunidades
-										SET Oportunidades.descripcion = @descripcionInput,
-											Oportunidades.observaciones = @observacionesInput,
-											Oportunidades.fechaModificacion = CONVERT(NVARCHAR(15),GETDATE(),103)
-
-								COMMIT
-							END TRY
-							BEGIN CATCH
-								IF @@TRANCOUNT > 0
-								ROLLBACK
-								RETURN -1*@@ERROR
-							END CATCH
-						END
-					ELSE
-						BEGIN
-							PRINT 'Recurso no existe'
-							RETURN -1
-						END
-				END
+					BEGIN TRY
+						BEGIN TRANSACTION
+							UPDATE Oportunidades
+								SET Oportunidades.descripcion = @descripcionInput,
+									Oportunidades.observaciones = @observacionesInput,
+									Oportunidades.fechaModificacion = CONVERT(NVARCHAR(15),GETDATE(),103),
+									Oportunidades.responsable = @responsableInput
+						COMMIT
+						RETURN 0
+					END TRY
+					BEGIN CATCH
+						IF @@TRANCOUNT > 0
+						ROLLBACK
+						RETURN -1*@@ERROR
+					END CATCH		
 			ELSE
 				BEGIN
 					PRINT 'No existe ese sitio'

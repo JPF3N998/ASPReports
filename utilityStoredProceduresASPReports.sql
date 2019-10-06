@@ -77,7 +77,8 @@ CREATE PROC spActualizarRatingAtributos
 	@rCapacidadAbsorcionUsoTuristico INT,
 	@rCapacidadTolerarUsoTuristico INT,
 	@rInteresPotencialAvisitantes INT,
-	@rImportanciaSPTI INT AS
+	@rImportanciaSPTI INT,
+	@responsableInput NVARCHAR(256) AS
 BEGIN
 	DECLARE @idASP INT;
 	EXEC spGetIDAsp @nombreASPInput,@idASP OUTPUT;
@@ -99,7 +100,8 @@ BEGIN
 											AtributosRecurso.capacidadTolerarUsoTuristico = @rCapacidadTolerarUsoTuristico,
 											AtributosRecurso.interesPotencialAvisitantes = @rInteresPotencialAvisitantes,
 											AtributosRecurso.importanciaSPTI = @rImportanciaSPTI,
-											AtributosRecurso.fechaModificacion = CONVERT(NVARCHAR(15),GETDATE(),103)
+											AtributosRecurso.fechaModificacion = CONVERT(NVARCHAR(15),GETDATE(),103),
+											AtributosRecurso.responsable = @responsableInput
 										WHERE @idRecurso = AtributosRecurso.idRecurso
 										EXEC spActualizarValoracion @nombreASPInput,@nombreSitioInput
 								COMMIT
@@ -141,7 +143,8 @@ CREATE PROC spActualizarRatingRecurso
 	@rRelacionTemaInterpretativoASP INT,
 	@rVariedadRecurso INT,
 	@rAtractivo INT,
-	@rAccesibildad INT AS
+	@rAccesibildad INT,
+	@responsableInput NVARCHAR(256) AS
 BEGIN
 	DECLARE @idASP INT;
 	EXEC spGetIDAsp @nombreASPInput,@idASP OUTPUT;
@@ -164,6 +167,7 @@ BEGIN
 											RatingRecurso.atractivo = @rAtractivo,
 											RatingRecurso.accesibilidad = @rAccesibildad,
 											RatingRecurso.fechaModificacion = CONVERT(NVARCHAR(15),GETDATE(),103)
+											RatingRecurso.responsable = @responsableInput
 										WHERE @idRecurso = RatingRecurso.idRecurso
 									exec spActualizarValoracion @nombreASPInput,@nombreSitioInput
 								COMMIT

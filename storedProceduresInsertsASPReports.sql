@@ -6,14 +6,14 @@ GO
 DROP PROC IF EXISTS spAgregarASP
 GO
 
-CREATE PROC spAgregarASP @nombreInput NVARCHAR(64),@ubicacionInput NVARCHAR(256) AS
+CREATE PROC spAgregarASP @nombreInput NVARCHAR(64),@ubicacionInput NVARCHAR(256),@responsableInput NVARCHAR(256) AS
 	BEGIN
 		DECLARE @idASP INT;
 		EXEC spGetIDAsp @nombreInput, @idASP OUTPUT;
 		IF @idASP IS NULL
 			BEGIN TRY
 				BEGIN TRANSACTION
-					INSERT INTO ASP(nombre,ubicacion,fechaCreacion,activo) VALUES (@nombreInput,@ubicacionInput,CONVERT(NVARCHAR(10),GETDATE(),103),1)
+					INSERT INTO ASP(nombre,ubicacion,fechaCreacion,responsable,activo) VALUES (@nombreInput,@ubicacionInput,CONVERT(NVARCHAR(10),GETDATE(),103),@responsableInput,1)
 				COMMIT
 				RETURN 0
 			END TRY
@@ -31,7 +31,8 @@ CREATE PROC spAgregarASP @nombreInput NVARCHAR(64),@ubicacionInput NVARCHAR(256)
 						BEGIN TRANSACTION
 							UPDATE ASP
 								SET ASP.activo = 1,
-									ASP.fechaCreacion = CONVERT(NVARCHAR(15),GETDATE(),103)
+									ASP.fechaCreacion = CONVERT(NVARCHAR(15),GETDATE(),103),
+									ASP.responsable = @responsableInput
 								WHERE ASP.id = @idASP
 						COMMIT
 						RETURN 0
@@ -65,7 +66,8 @@ CREATE PROC spAgregarSitio
 	@calidadInput NVARCHAR(512),
 	@tamanoInput NVARCHAR(512),
 	@capacidadInput NVARCHAR(128),
-	@observacionesDisenoInfraestructuraInput NVARCHAR(1024) AS
+	@observacionesDisenoInfraestructuraInput NVARCHAR(1024),
+	@responsableInput NVARCHAR(256) AS
 
 	BEGIN
 		DECLARE @idASP INT;
@@ -82,8 +84,8 @@ CREATE PROC spAgregarSitio
 							DECLARE @idTipoFigura INT;
 							EXEC spGetIDTipoFigura @nombreTipoFiguraInput,@idTipoFigura OUTPUT
 							BEGIN TRANSACTION
-								INSERT INTO Sitios(idASP,nombre,ubicacion,zonificacion,idTipoFigura,conveniencia,calidad,tamano,capacidad,observacionesDisenoInfraestructura,valoracionRelacionPropositoASP,valoracionRelacionTemasInterpretativos,valoracionVariedadRecurso,valoracionAtractivo,valoracionAccesibilidad,fechaCreacion,activo)
-								VALUES (@idASP,@nombreSitioInput,@ubicacionInput,@zonificacionInput,@idTipoFigura,@convenienciaInput,@calidadInput,@tamanoInput,@capacidadInput,@observacionesDisenoInfraestructuraInput,0,0,0,0,0,CONVERT(VARCHAR(10),GETDATE(),103),1)
+								INSERT INTO Sitios(idASP,nombre,ubicacion,zonificacion,idTipoFigura,conveniencia,calidad,tamano,capacidad,observacionesDisenoInfraestructura,valoracionRelacionPropositoASP,valoracionRelacionTemasInterpretativos,valoracionVariedadRecurso,valoracionAtractivo,valoracionAccesibilidad,fechaCreacion,responsable,activo)
+								VALUES (@idASP,@nombreSitioInput,@ubicacionInput,@zonificacionInput,@idTipoFigura,@convenienciaInput,@calidadInput,@tamanoInput,@capacidadInput,@observacionesDisenoInfraestructuraInput,0,0,0,0,0,CONVERT(VARCHAR(10),GETDATE(),103),@responsableInput,1)
 							COMMIT
 							RETURN 0
 						END TRY
@@ -102,7 +104,8 @@ CREATE PROC spAgregarSitio
 								BEGIN TRANSACTION
 									UPDATE Sitios
 										SET Sitios.activo = 1,
-											Sitios.fechaCreacion = CONVERT(NVARCHAR(15),GETDATE(),103)
+											Sitios.fechaCreacion = CONVERT(NVARCHAR(15),GETDATE(),103),
+											Sitios.responsable = @responsableInput
 										WHERE Sitios.id = @idSitio
 								COMMIT
 								RETURN 0
@@ -137,6 +140,7 @@ CREATE PROC spAgregarRecurso
 	@nombreSitioInput NVARCHAR(64),
 	@nombreTipoRecursoInput NVARCHAR(64),
 	@nombreRecursoInput NVARCHAR(128),
+	@responsableInput NVARCHAR(256),
 	--Rating de atributos del recurso puntajes de 1-5
 	@rDisponibilidad INT,
 	@rCapacidadAbsorcionUsoTuristico INT,
@@ -178,14 +182,14 @@ BEGIN
 								EXEC spGetIDTipoRecurso @nombreTipoRecursoInput,@idTipoRecurso OUTPUT;
 								BEGIN TRANSACTION
 
-									INSERT INTO Recursos(idTipoRecurso,idSitio,nombre,fechaModificacion,activo) VALUES (@idTipoRecurso,@idSitio,@nombreRecursoInput,CONVERT(NVARCHAR(15),GETDATE(),103),1)
+									INSERT INTO Recursos(idTipoRecurso,idSitio,nombre,fechaModificacion,activo) VALUES (@idTipoRecurso,@idSitio,@nombreRecursoInput,CONVERT(NVARCHAR(15),GETDATE(),103),@responsableInput,1)
 									
 
-									INSERT INTO RatingRecurso(idRecurso,relacionPropositoASP,relacionTemaInterpretativoASP,variedadRecurso,atractivo,accesibilidad,fechaModificacion)
-									SELECT MAX(id) as idRecurso,@rRelacionPropositoASP,@rRelacionTemaInterpretativoASP,@rVariedadRecurso,@rAtractivo,@rAccesibildad,CONVERT(NVARCHAR(15),GETDATE(),103) FROM Recursos
+									INSERT INTO RatingRecurso(idRecurso,relacionPropositoASP,relacionTemaInterpretativoASP,variedadRecurso,atractivo,accesibilidad,fechaModificacion,responsable)
+									SELECT SCOPE_IDENTITY() as idRecurso,@rRelacionPropositoASP,@rRelacionTemaInterpretativoASP,@rVariedadRecurso,@rAtractivo,@rAccesibildad,CONVERT(NVARCHAR(15),GETDATE(),103),@responsableInput FROM Recursos
 									
-									INSERT INTO AtributosRecurso(idRecurso,disponibilidad,capacidadAbsorcionUsoTuristico,capacidadTolerarUsoTuristico,interesPotencialAvisitantes,importanciaSPTI,fechaModificacion)
-									SELECT MAX(id),@rDisponibilidad,@rCapacidadAbsorcionUsoTuristico,@rCapacidadTolerarUsoTuristico,@rInteresPotencialAvisitantes,@rImportanciaSPTI,CONVERT(NVARCHAR(15),GETDATE(),103) FROM Recursos
+									INSERT INTO AtributosRecurso(idRecurso,disponibilidad,capacidadAbsorcionUsoTuristico,capacidadTolerarUsoTuristico,interesPotencialAvisitantes,importanciaSPTI,fechaModificacion,responsable)
+									SELECT SCOPE_IDENTITY,@rDisponibilidad,@rCapacidadAbsorcionUsoTuristico,@rCapacidadTolerarUsoTuristico,@rInteresPotencialAvisitantes,@rImportanciaSPTI,CONVERT(NVARCHAR(15),GETDATE(),103),@responsableInput FROM Recursos
 									
 									EXEC spActualizarValoracion @nombreASPInput, @nombreSitioInput
 									
@@ -210,7 +214,8 @@ BEGIN
 										
 										UPDATE Recursos
 											SET Recursos.activo = 1,
-												Recursos.fechaModificacion = CONVERT(NVARCHAR(15),GETDATE(),103)
+												Recursos.fechaModificacion = CONVERT(NVARCHAR(15),GETDATE(),103),
+												Recursos.responsable = @responsableInput
 												WHERE Recursos.id = @idRecurso
 
 									COMMIT
@@ -250,7 +255,8 @@ CREATE PROC spAgregarOportunidad
 	@nombreASPInput NVARCHAR(64),
 	@nombreSitioInput NVARCHAR(64),
 	@descripcionInput NVARCHAR(512),
-	@observacionesInput NVARCHAR(1024) AS
+	@observacionesInput NVARCHAR(1024),
+	@responsableInput NVARCHAR(256) AS
 BEGIN
 	DECLARE @idASP INT;
 	EXEC spGetIDAsp @nombreASPInput,@idASP OUTPUT;
@@ -278,8 +284,8 @@ BEGIN
 						BEGIN
 							BEGIN TRY
 								BEGIN TRANSACTION
-									INSERT INTO Oportunidades(idSitio,descripcion,observaciones,fechaModificacion,activo)
-									VALUES (@idSitio,@descripcionInput,@observacionesInput,CONVERT(NVARCHAR(15),GETDATE(),103),1)
+									INSERT INTO Oportunidades(idSitio,descripcion,observaciones,fechaModificacion,responsable,activo)
+									VALUES (@idSitio,@descripcionInput,@observacionesInput,CONVERT(NVARCHAR(15),GETDATE(),103),@responsableInput,1)
 								COMMIT
 								RETURN 0
 							END TRY
@@ -302,7 +308,7 @@ BEGIN
 										UPDATE Oportunidades
 										SET Oportunidades.activo = 1,
 											Oportunidades.fechaModificacion = CONVERT(NVARCHAR(15),GETDATE(),103)
-					
+											Oportunidades.responsable = @responsableInput
 									COMMIT
 									RETURN 0
 								END TRY

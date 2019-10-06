@@ -1,12 +1,5 @@
 --Presione F5 para crear la base de datos junto con las tablas
 
-/*
-NOTAS:
-	+ En la aplicacion web, guardar las secciones como  [ASP > Sitio > Recurso/Oportunidad] para pasarlos como parametros
-	  en los stored procedures y no tener que buscar una manera de buscarlos, si no enviarlos directamente.Puede ser una lista estatica o incluso una pila.
-
-*/
-
 USE master
 GO
 
@@ -27,6 +20,7 @@ CREATE TABLE ASP(
 	nombre NVARCHAR(64) NOT NULL,
 	ubicacion NVARCHAR(256) NOT NULL,
 	fechaCreacion NVARCHAR(10) NOT NULL,
+	responsable NVARCHAR(256) NOT NULL,
 	activo BIT NOT NULL
 )
 GO
@@ -60,6 +54,7 @@ CREATE TABLE Sitios(
 	valoracionAtractivo FLOAT NOT NULL,
 	valoracionAccesibilidad FLOAT NOT NULL,
 	fechaCreacion NVARCHAR(10) NOT NULL,
+	responsable NVARCHAR(256) NOT NULL,
 	activo BIT NOT NULL,
 	FOREIGN KEY (idASP) REFERENCES ASP(id),
 	FOREIGN KEY (idTipoFigura) REFERENCES TipoFigura(id)
@@ -94,6 +89,7 @@ CREATE TABLE Recursos(
 	idSitio INT NOT NULL,
 	nombre NVARCHAR(128) NOT NULL,
 	fechaModificacion NVARCHAR(10) NOT NULL,
+	responsable NVARCHAR(256) NOT NULL,
 	activo BIT NOT NULL,
 	FOREIGN KEY (idTipoRecurso) REFERENCES TipoRecurso(id),
 	FOREIGN KEY (idSitio) REFERENCES Sitios(id)
@@ -111,7 +107,7 @@ CREATE TABLE RatingRecurso(
 	atractivo INT NOT NULL,
 	accesibilidad INT NOT NULL,
 	fechaModificacion NVARCHAR(10) NOT NULL,
-
+	responsable NVARCHAR(256) NOT NULL
 	FOREIGN KEY (idRecurso) REFERENCES Recursos(id)
 )
 GO
@@ -127,7 +123,7 @@ CREATE TABLE AtributosRecurso(
 	interesPotencialAvisitantes INT NOT NULL,
 	importanciaSPTI INT NOT NULL, --importancia relativa Significado, el Proposito y los temas Interpretativos del sitio
 	fechaModificacion NVARCHAR(10) NOT NULL,
-
+	responsable NVARCHAR(256) NOT NULL,
 	FOREIGN KEY (idRecurso) REFERENCES Recursos(id)
 )
 GO
@@ -141,6 +137,7 @@ CREATE TABLE Oportunidades(
 	descripcion NVARCHAR(512) NOT NULL,
 	observaciones NVARCHAR(1024) NOT NULL, --Campo para riesgos y detalles importantes
 	fechaModificacion NVARCHAR(10) NOT NULL,
+	responsable NVARCHAR(256) NOT NULL,
 	activo BIT NOT NULL,
 	FOREIGN KEY (idSitio) REFERENCES Sitios(id)
 )
