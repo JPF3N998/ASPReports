@@ -45,6 +45,21 @@ CREATE PROC [dbo].[spLogin] @nombreUsuarioInput NVARCHAR(50), @passwordInput NVA
 	END CATCH
 END
 GO
+
+--PROC que retorna el numero de cedula de un usuario
+DROP PROC IF EXISTS spGetIDUsuario
+GO
+CREATE PROC spGetIDUsuario @usernameInput NVARCHAR(50), @cedula NVARCHAR(15) OUTPUT AS
+	BEGIN
+		SET @cedula = (SELECT U.cedula FROM Usuario U WHERE U.usuario = @usernameInput);
+	END
+GO
+/*
+DECLARE @ced NVARCHAR(15)
+exec spGetIDUsuario 'admin',@ced out
+print @ced
+*/
+
 --PROC para sacar el ID del tipo de recurso usando el nombre
 DROP PROC IF EXISTS spGetIDTipoRecurso 
 GO

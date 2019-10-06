@@ -9,11 +9,11 @@ BEGIN
 	
 	IF @nombreASPInput LIKE '*'
 		BEGIN
-			SELECT A.nombre AS [Nombre], A.ubicacion AS [Ubicacion], A.fechaCreacion AS [Fecha de creacion del ASP] FROM ASP A WHERE A.activo = 1 
+			SELECT A.nombre AS [Nombre], A.ubicacion AS [Ubicacion], A.fechaCreacion AS [Ultima modificacion],A.responsable AS [Responsable] FROM ASP A WHERE A.activo = 1 
 		END
 	ELSE
 		BEGIN
-			SELECT A.nombre AS [Nombre], A.ubicacion AS [Ubicacion], A.fechaCreacion AS [Fecha de creacion del ASP] FROM ASP A WHERE LOWER(A.nombre) LIKE LOWER(@nombreASPInput) AND A.activo = 1
+			SELECT A.nombre AS [Nombre], A.ubicacion AS [Ubicacion], A.fechaCreacion AS [Ultima modificacion],A.responsable AS [Responsable] FROM ASP A WHERE LOWER(A.nombre) LIKE LOWER(@nombreASPInput) AND A.activo = 1
 		END
 END
 GO
@@ -39,7 +39,9 @@ CREATE PROC spBuscarSitio @nombreASPInput NVARCHAR(64),@nombreSitioInput NVARCHA
 				S.valoracionRelacionTemasInterpretativos AS [Relacion con temas interpretativos del ASP],
 				S.valoracionVariedadRecurso AS [Variedad de los recursos],
 				S.valoracionAtractivo AS [Atractivo],
-				S.valoracionAccesibilidad AS [Accesibilidad] 
+				S.valoracionAccesibilidad AS [Accesibilidad],
+				S.fechaCreacion AS [Ultima modificacion],
+				S.responsable AS [Responsable]
 				FROM Sitios S WHERE S.idASP = @idASP AND S.activo = 1;
 			END
 		ELSE
@@ -51,7 +53,9 @@ CREATE PROC spBuscarSitio @nombreASPInput NVARCHAR(64),@nombreSitioInput NVARCHA
 				S.valoracionRelacionTemasInterpretativos AS [Relacion con temas interpretativos del ASP],
 				S.valoracionVariedadRecurso AS [Variedad de los recursos],
 				S.valoracionAtractivo AS [Atractivo],
-				S.valoracionAccesibilidad AS [Accesibilidad] 
+				S.valoracionAccesibilidad AS [Accesibilidad],
+				S.fechaCreacion AS [Ultima modificacion],
+				S.responsable AS [Responsable]
 				FROM Sitios S WHERE LOWER(S.nombre) = LOWER(@nombreSitioInput) AND S.idASP = @idASP AND S.activo = 1;
 			END
 	END
@@ -83,11 +87,11 @@ CREATE PROC spBuscarRecurso @nombreASPinput NVARCHAR(64),@nombreSitioInput NVARC
 						
 						IF @nombreRecursoInput LIKE '*'
 							BEGIN
-								SELECT R.nombre AS [Nombre de recurso],TR.nombre AS [Tipo de recurso],R.fechaModificacion AS [Ultima fecha de modificacion] FROM Recursos R JOIN TipoRecurso TR ON R.idTipoRecurso = TR.id WHERE R.activo = 1  AND @idSitio = R.idSitio
+								SELECT R.nombre AS [Nombre de recurso],TR.nombre AS [Tipo de recurso],R.fechaModificacion AS [Ultima modificacion],R.responsable AS [Responsable] FROM Recursos R JOIN TipoRecurso TR ON R.idTipoRecurso = TR.id WHERE R.activo = 1  AND @idSitio = R.idSitio
 							END
 						ELSE
 							BEGIN
-								SELECT R.nombre AS [Nombre de recurso],TR.nombre AS [Tipo de recurso],R.fechaModificacion AS [Ultima fecha de modificacion] FROM Recursos R JOIN TipoRecurso TR ON R.idTipoRecurso = TR.id WHERE R.activo = 1 AND LOWER(R.nombre) LIKE LOWER(@nombreRecursoInput)  AND @idSitio = R.idSitio
+								SELECT R.nombre AS [Nombre de recurso],TR.nombre AS [Tipo de recurso],R.fechaModificacion AS [Ultima modificacion],R.responsable AS [Responsable] FROM Recursos R JOIN TipoRecurso TR ON R.idTipoRecurso = TR.id WHERE R.activo = 1 AND LOWER(R.nombre) LIKE LOWER(@nombreRecursoInput)  AND @idSitio = R.idSitio
 							END
 
 					END
@@ -136,7 +140,7 @@ CREATE PROC spGetRatingCaracteristicasRecurso @nombreASPInput NVARCHAR(64),@nomb
 
 						IF @idRecurso IS NOT NULL  AND @activoRecurso = 1
 							BEGIN
-								SELECT RR.relacionPropositoASP AS [Relacion con el ASP],RR.relacionTemaInterpretativoASP AS [Relacion con los temas interpretativos del ASP], RR.variedadRecurso AS [Variedad del recurso],RR.atractivo AS [Atractivo],RR.accesibilidad AS [Accesibilidad] FROM RatingRecurso RR WHERE @idRecurso = RR.idRecurso;
+								SELECT RR.relacionPropositoASP AS [Relacion con el ASP],RR.relacionTemaInterpretativoASP AS [Relacion con los temas interpretativos del ASP], RR.variedadRecurso AS [Variedad del recurso],RR.atractivo AS [Atractivo],RR.accesibilidad AS [Accesibilidad],RR.fechaModificacion AS [Ultima modificacion],RR.responsable AS [Responsable] FROM RatingRecurso RR WHERE @idRecurso = RR.idRecurso;
 							END
 						ELSE
 							BEGIN
