@@ -77,7 +77,11 @@ CREATE PROC spGetIDTipoRecurso @nombreTipoRecursoInput NVARCHAR(128), @idRecurso
 			END
 	END
 GO
-
+/*
+DECLARE @out int
+EXEC spGetIDTipoRecurso 'Geologico',@out out
+print @out
+*/
 --PROC para actualizar los ratings de un recurso
 DROP PROC IF EXISTS spActualizarRatingRecurso
 GO
@@ -86,7 +90,7 @@ CREATE PROC spActualizarRatingRecurso
 	@nombreSitioInput NVARCHAR(64),
 	@nombreRecursoInput NVARCHAR(128),
 	@rRelacionPropositoASP INT,
-	@rRelacionTemaInterpretativoASP INT,1
+	@rRelacionTemaInterpretativoASP INT,
 	@rVariedadRecurso INT,
 	@rAtractivo INT,
 	@rAccesibildad INT,

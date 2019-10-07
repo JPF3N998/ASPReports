@@ -31,34 +31,69 @@ INSERT INTO TipoRecurso(nombre, fechaCreacion) VALUES ('Arquitectonico', CONVERT
 INSERT INTO TipoRecurso(nombre, fechaCreacion) VALUES ('Arqueologico', CONVERT(NVARCHAR(15),GETDATE(),103))
 
 --Insert Recursos, Atributos y Rating
-INSERT INTO Recursos(idTipoRecurso,idSitio,nombre,fechaModificacion,responsable,activo)
-	VALUES (1, 1, 'Lago', CONVERT(NVARCHAR(15),GETDATE(),103),'Administrador', 1)
-									
-INSERT INTO AtributosRecurso(idRecurso,disponibilidad,capacidadAbsorcionUsoTuristico,capacidadTolerarUsoTuristico,interesPotencialAvisitantes,importanciaSPTI,fechaModificacion,responsable)
-	SELECT SCOPE_IDENTITY(), 5, 5, 5, 5, 5,CONVERT(NVARCHAR(15),GETDATE(),103),'Administrador' FROM Recursos
 
-INSERT INTO RatingRecurso(idRecurso,relacionPropositoASP,relacionTemaInterpretativoASP,variedadRecurso,atractivo,accesibilidad,fechaModificacion,responsable)
-	SELECT SCOPE_IDENTITY() as idRecurso, 3, 3, 3, 3, 3,CONVERT(NVARCHAR(15),GETDATE(),103),'Administrador' FROM Recursos
+EXEC	[dbo].[spAgregarRecurso]
+		@nombreASPInput = N'Volcan Irazu',
+		@nombreSitioInput = N'Crater',
+		@nombreTipoRecursoInput = N'Natural',
+		@nombreRecursoInput = N'Lago',
+		@ubicacionInput = N'Cartago',
+		@anomaliaInput = N'no se',
+		@traslapeInput = N'ni idea',
+		@condicionInput = N'ak7',
+		@atractivosInput = N'muchos',
+		@soportaUsoInput = 1,
+		@capacidadInput = N'5',
+		@hectareasInput = N'5000',
+		@oportunidadesUsoInput = N'muchas',
+		@rRelacionPropositoASP = 2,
+		@rRelacionTemaInterpretativoASP = 3,
+		@rVariedadRecurso = 1,
+		@rAtractivo = 2,
+		@rAccesibildad = 3,
+		@responsableInput = N'987654321'
+								
+EXEC	[dbo].[spAgregarRecurso]
+		@nombreASPInput = N'Volcan Irazu',
+		@nombreSitioInput = N'Crater',
+		@nombreTipoRecursoInput = N'Natural',
+		@nombreRecursoInput = N'Foliles',
+		@ubicacionInput = N'Cartagp',
+		@anomaliaInput = N'no se',
+		@traslapeInput = N'ni idea',
+		@condicionInput = N'ak7',
+		@atractivosInput = N'muchos',
+		@soportaUsoInput = 1,
+		@capacidadInput = N'5',
+		@hectareasInput = N'5000',
+		@oportunidadesUsoInput = N'muchas',
+		@rRelacionPropositoASP = 2,
+		@rRelacionTemaInterpretativoASP = 3,
+		@rVariedadRecurso = 1,
+		@rAtractivo = 2,
+		@rAccesibildad = 3,
+		@responsableInput = N'987654321'
 
-
-INSERT INTO Recursos(idTipoRecurso,idSitio,nombre,fechaModificacion,responsable,activo)
-	VALUES (6, 1, 'Foliles', CONVERT(NVARCHAR(15),GETDATE(),103),'Administrador',1)
-									
-INSERT INTO AtributosRecurso(idRecurso,disponibilidad,capacidadAbsorcionUsoTuristico,capacidadTolerarUsoTuristico,interesPotencialAvisitantes,importanciaSPTI,fechaModificacion,responsable)
-	SELECT SCOPE_IDENTITY(), 5, 5, 5, 5, 5,CONVERT(NVARCHAR(15),GETDATE(),103),'Administrador' FROM Recursos
-
-INSERT INTO RatingRecurso(idRecurso,relacionPropositoASP,relacionTemaInterpretativoASP,variedadRecurso,atractivo,accesibilidad,fechaModificacion,responsable)
-	SELECT SCOPE_IDENTITY() as idRecurso, 3, 3, 3, 3, 3,CONVERT(NVARCHAR(15),GETDATE(),103),'Administrador' FROM Recursos
-
-
-INSERT INTO Recursos(idTipoRecurso,idSitio,nombre,fechaModificacion,responsable,activo)
-	VALUES (4, 1, 'Arboles anaranjados de fondo', CONVERT(NVARCHAR(15),GETDATE(),103),'Administrador', 1)
-									
-INSERT INTO AtributosRecurso(idRecurso,disponibilidad,capacidadAbsorcionUsoTuristico,capacidadTolerarUsoTuristico,interesPotencialAvisitantes,importanciaSPTI,fechaModificacion,responsable)
-	SELECT SCOPE_IDENTITY() as idRecurso, 5, 5, 5, 5, 5,CONVERT(NVARCHAR(15),GETDATE(),103),'Administrador' FROM Recursos
-
-INSERT INTO RatingRecurso(idRecurso,relacionPropositoASP,relacionTemaInterpretativoASP,variedadRecurso,atractivo,accesibilidad,fechaModificacion,responsable)
-	SELECT SCOPE_IDENTITY() as idRecurso, 3, 3, 3, 3, 3,CONVERT(NVARCHAR(15),GETDATE(),103),'Administrador' FROM Recursos
+EXEC	[dbo].[spAgregarRecurso]
+		@nombreASPInput = N'Volcan Irazu',
+		@nombreSitioInput = N'Crater',
+		@nombreTipoRecursoInput = N'Natural',
+		@nombreRecursoInput = N'Arboles anaranjados de fondo',
+		@ubicacionInput = N'Cartagp',
+		@anomaliaInput = N'no se',
+		@traslapeInput = N'ni idea',
+		@condicionInput = N'ak7',
+		@atractivosInput = N'muchos',
+		@soportaUsoInput = 1,
+		@capacidadInput = N'5',
+		@hectareasInput = N'5000',
+		@oportunidadesUsoInput = N'muchas',
+		@rRelacionPropositoASP = 2,
+		@rRelacionTemaInterpretativoASP = 3,
+		@rVariedadRecurso = 1,
+		@rAtractivo = 2,
+		@rAccesibildad = 3,
+		@responsableInput = N'987654321'
 
 	--Insert Oportunidades
 INSERT INTO Oportunidades(idSitio,descripcion,observaciones,fechaModificacion,responsable,activo)

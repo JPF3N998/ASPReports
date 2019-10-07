@@ -1,6 +1,8 @@
 USE ASPReports
 GO
 
+SET NOCOUNT ON;
+
 --PROC para la creacion de un ASP, si esta desactivado, se activa
 
 DROP PROC IF EXISTS spAgregarASP
@@ -133,7 +135,8 @@ GO
 
 DROP PROC IF EXISTS spAgregarRecurso
 GO
-CREATE PROC spAgregarRecurso 
+CREATE PROC spAgregarRecurso
+	 
 	@nombreASPInput NVARCHAR(64),
 	@nombreSitioInput NVARCHAR(64),
 	@nombreTipoRecursoInput NVARCHAR(64),
@@ -176,36 +179,35 @@ BEGIN
 					DECLARE @idRecurso INT;
 					EXEC spGetIDRecurso @idSitio,@nombreRecursoInput,@idRecurso OUTPUT;
 					
-					IF @idRecurso IS NULL
-						BEGIN
-							BEGIN TRY
-								DECLARE @idTipoRecurso INT;
-								EXEC spGetIDTipoRecurso @nombreTipoRecursoInput,@idTipoRecurso OUTPUT;
-								BEGIN TRANSACTION
+					print @idRecurso
 
-									INSERT INTO Recursos(idTipoRecurso,idSitio,nombre,ubicacion,anomalia,traslape,condicion,atractivos,soportaUso,capacidad,hectareas,oportunidadesUso,responsable,fechaModificacion,activo)
-									VALUES (@idTipoRecurso,@idSitio,@nombreRecursoInput,@ubicacionInput,@anomaliaInput,@traslapeInput,@condicionInput,@atractivosInput,@soportaUsoInput,@capacidadInput,@hectareasInput,@oportunidadesUsoInput,@responsableInput,CONVERT(NVARCHAR(15),GETDATE(),103),1)
+					IF @idRecurso IS NULL
+						BEGIN TRY
+							
+							DECLARE @idTipoRecurso INT;
+							EXEC spGetIDTipoRecurso @nombreTipoRecursoInput,@idTipoRecurso OUTPUT;
+							BEGIN TRANSACTION
+								
+								INSERT INTO Recursos(idTipoRecurso,idSitio,nombre,ubicacion,anomalia,traslape,condicion,atractivos,soportaUso,capacidad,hectareas,oportunidadesUso,responsable,fechaModificacion,activo)
+								VALUES (@idTipoRecurso,@idSitio,@nombreRecursoInput,@ubicacionInput,@anomaliaInput,@traslapeInput,@condicionInput,@atractivosInput,@soportaUsoInput,@capacidadInput,@hectareasInput,@oportunidadesUsoInput,@responsableInput,CONVERT(NVARCHAR(15),GETDATE(),103),1)
+								
+								INSERT INTO RatingRecurso(idRecurso,relacionPropositoASP,relacionTemaInterpretativoASP,variedadRecurso,atractivo,accesibilidad,fechaModificacion,responsable)
+								SELECT SCOPE_IDENTITY() as idRecurso,@rRelacionPropositoASP,@rRelacionTemaInterpretativoASP,@rVariedadRecurso,@rAtractivo,@rAccesibildad,CONVERT(NVARCHAR(15),GETDATE(),103),@responsableInput FROM Recursos
 									
-									INSERT INTO RatingRecurso(idRecurso,relacionPropositoASP,relacionTemaInterpretativoASP,variedadRecurso,atractivo,accesibilidad,fechaModificacion,responsable)
-									SELECT SCOPE_IDENTITY() as idRecurso,@rRelacionPropositoASP,@rRelacionTemaInterpretativoASP,@rVariedadRecurso,@rAtractivo,@rAccesibildad,CONVERT(NVARCHAR(15),GETDATE(),103),@responsableInput FROM Recursos
+								EXEC spActualizarValoracion @nombreASPInput, @nombreSitioInput
 									
-									EXEC spActualizarValoracion @nombreASPInput, @nombreSitioInput
-									
-								COMMIT
-								RETURN 0
-							END TRY
-							BEGIN CATCH
-								IF @@TRANCOUNT > 0
-								ROLLBACK
-								RETURN -1*@@ERROR
-							END CATCH
-						END
+							COMMIT
+							RETURN 0
+						END TRY
+						BEGIN CATCH
+							IF @@TRANCOUNT > 0
+							ROLLBACK
+							RETURN -1*@@ERROR
+						END CATCH
 					ELSE
 						BEGIN
-							
 							DECLARE @recursoActivo BIT;
 							EXEC spRecursoActivo @idRecurso,@recursoActivo OUTPUT;
-
 							IF @idRecurso = 0
 								BEGIN TRY
 									BEGIN TRANSACTION
@@ -218,7 +220,7 @@ BEGIN
 										
 									COMMIT
 									RETURN 0
-									END TRY
+								END TRY
 								BEGIN CATCH
 									IF @@TRANCOUNT > 0
 										ROLLBACK
@@ -245,6 +247,37 @@ BEGIN
 		END
 END
 GO
+
+/*
+DECLARE	@return_value int
+
+EXEC	@return_value = [dbo].[spAgregarRecurso]
+		@nombreASPInput = N'Volcan Irazu',
+		@nombreSitioInput = N'Crater',
+		@nombreTipoRecursoInput = N'Natural',
+		@nombreRecursoInput = N'Prueba1',
+		@ubicacionInput = N'Cartagp',
+		@anomaliaInput = N'no se',
+		@traslapeInput = N'ni idea',
+		@condicionInput = N'ak7',
+		@atractivosInput = N'muchos',
+		@soportaUsoInput = 1,
+		@capacidadInput = N'5',
+		@hectareasInput = N'5000',
+		@oportunidadesUsoInput = N'muchas',
+		@rRelacionPropositoASP = 2,
+		@rRelacionTemaInterpretativoASP = 3,
+		@rVariedadRecurso = 1,
+		@rAtractivo = 2,
+		@rAccesibildad = 3,
+		@responsableInput = N'987654321'
+
+SELECT	'Return Value' = @return_value
+
+GO
+
+
+*/
 
 --PROC para agregar una oportunidad
 DROP PROC IF EXISTS spAgregarOportunidad
