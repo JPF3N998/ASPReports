@@ -247,3 +247,39 @@ DECLARE @fecha NVARCHAR(15)
 EXEC spGetFechaModificacionRecurso 'Volcan Irazu','Crater','Lago',@fecha OUT
 PRINT @fecha
 */
+
+DROP PROC IF EXISTS spGetRecursos
+GO
+CREATE PROC [dbo].[spGetRecursos](
+        @nombreSitio varchar(50)
+		)
+AS
+BEGIN
+	BEGIN TRY
+
+		DECLARE @idSitio int
+
+			SELECT @idSitio = id FROM Sitios S WHERE @nombreSitio = S.nombre
+
+		SELECT R.nombre FROM Recursos R WHERE R.activo = 1 AND R.idSitio = @idSitio;
+		RETURN 1
+
+	END TRY
+	BEGIN CATCH
+		If @@TRANCOUNT>0 ROLLBACK
+			Return -1*@@ERROR
+	END CATCH
+END
+GO
+
+DROP PROC IF EXISTS spGetSitios
+GO
+CREATE PROCEDURE [dbo].[spGetSitios] @nombreASP NVARCHAR(64)
+AS
+BEGIN
+	SELECT Sitios.nombre
+	FROM Sitios
+	INNER JOIN ASP
+	ON Sitios.idASP = ASP.id where LOWER(ASP.nombre)=LOWER (@nombreASP);
+END
+GO
