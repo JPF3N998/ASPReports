@@ -1,6 +1,6 @@
 --Presione F5 para crear la base de datos junto con las tablas
 
-USE master
+/*USE master
 GO
 
 DROP DATABASE IF EXISTS ASPReports
@@ -10,11 +10,47 @@ CREATE DATABASE ASPReports
 GO
 
 USE ASPReports
+GO*/
+
+------------Orden en el que se borran las tablas------------
+/** DESCOMENTE PARA BORRAR LAS TABLAS
+DROP TABLE IF EXISTS Usuario
 GO
 
---Creacion de la tabla de ASPs
+DROP TABLE IF EXISTS Oportunidades
+GO
+
+DROP TABLE IF EXISTS RatingRecurso
+GO
+
+DROP TABLE IF EXISTS Recursos
+GO
+
+DROP TABLE IF EXISTS TipoRecurso
+GO
+
+
+DROP TABLE IF EXISTS TipoFigura
+GO
+
+DROP TABLE IF EXISTS Sitios
+GO
+
 DROP TABLE IF EXISTS ASP
 GO
+
+--Resets de los identities en caso de que se necesite
+DBCC CHECKIDENT ('Oportunidades', RESEED,0);
+DBCC CHECKIDENT ('TipoRecurso', RESEED,0);
+DBCC CHECKIDENT ('Recursos', RESEED,0);
+DBCC CHECKIDENT ('RatingRecurso', RESEED,0);
+DBCC CHECKIDENT ('TipoFigura', RESEED,0);
+DBCC CHECKIDENT ('Sitios', RESEED,0);
+DBCC CHECKIDENT ('ASP', RESEED,0);
+**/
+------------------------
+
+--Creacion de la tabla de ASPs
 CREATE TABLE ASP(
 	id INT IDENTITY(1,1) PRIMARY KEY,
 	nombre NVARCHAR(64) NOT NULL,
@@ -26,8 +62,7 @@ CREATE TABLE ASP(
 GO
 
 --Creacion de la tabla para los tipos de figura
-DROP TABLE IF EXISTS TipoFigura
-GO
+
 CREATE TABLE TipoFigura(
 	id INT IDENTITY(1,1) PRIMARY KEY,
 	nombre NVARCHAR(32) NOT NULL
@@ -35,8 +70,7 @@ CREATE TABLE TipoFigura(
 GO
 
 --Creacion de la tabla de sitios
-DROP TABLE IF EXISTS Sitios
-GO
+
 CREATE TABLE Sitios(
 	id INT IDENTITY(1,1) PRIMARY KEY,
 	idASP INT NOT NULL,
@@ -61,21 +95,12 @@ CREATE TABLE Sitios(
 GO
 
 --Punto b, pagina 12 de la herramienta del SINAC
-DROP TABLE IF EXISTS TipoRecurso
-GO
+
 CREATE TABLE TipoRecurso(
 	id INT IDENTITY(1,1) PRIMARY KEY,
 	nombre NVARCHAR(128) NOT NULL,
 	fechaCreacion NVARCHAR(10) NOT NULL
 )
-/*
-INSERT INTO TipoRecurso(nombre,fechaCreacion) VALUES ('Natural',CONVERT(NVARCHAR(10),GETDATE(),103))
-INSERT INTO TipoRecurso(nombre,fechaCreacion) VALUES ('Etnografico',CONVERT(NVARCHAR(10),GETDATE(),103))
-INSERT INTO TipoRecurso(nombre,fechaCreacion) VALUES ('Geologico',CONVERT(NVARCHAR(10),GETDATE(),103))
-INSERT INTO TipoRecurso(nombre,fechaCreacion) VALUES ('De paisaje',CONVERT(NVARCHAR(10),GETDATE(),103))
-INSERT INTO TipoRecurso(nombre,fechaCreacion) VALUES ('Arquitectonico',CONVERT(NVARCHAR(10),GETDATE(),103))
-INSERT INTO TipoRecurso(nombre,fechaCreacion) VALUES ('Arqueologico',CONVERT(NVARCHAR(10),GETDATE(),103))
-GO*/
 
 /**
 	1) Los campos relacionPropositoASP, relacionTemaInterpretativoASP,
@@ -83,8 +108,7 @@ GO*/
 	2) Los campos disponibilidad, capacidadAbsorcion, capacidadTolerar
 	e importanciaSPTI vienen en el cuadro 2 de la herramienta del SINAC
 **/
-DROP TABLE IF EXISTS Recursos
-GO
+
 CREATE TABLE Recursos(
 	id INT IDENTITY(1,1) PRIMARY KEY,
 	idTipoRecurso INT NOT NULL,
@@ -108,8 +132,7 @@ CREATE TABLE Recursos(
 GO
 
 --Atributos para el rating de los recursos
-DROP TABLE IF EXISTS RatingRecurso
-GO
+
 CREATE TABLE RatingRecurso(
 	id INT IDENTITY(1,1) PRIMARY KEY,
 	idRecurso INT NOT NULL,
@@ -125,8 +148,7 @@ CREATE TABLE RatingRecurso(
 GO
 
 --Creacion de la tabla de Oportunidades
-DROP TABLE IF EXISTS Oportunidades
-GO
+
 CREATE TABLE Oportunidades(
 	id INT IDENTITY(1,1) PRIMARY KEY,
 	idSitio INT NOT NULL,
@@ -140,8 +162,7 @@ CREATE TABLE Oportunidades(
 GO
 
 --Creacion de la tablas para usuarios
-DROP TABLE IF EXISTS Usuario
-GO
+
 CREATE TABLE Usuario(
 	id INT PRIMARY KEY IDENTITY(1,1),
 	nombre NVARCHAR(50) NOT NULL,
@@ -167,3 +188,12 @@ GO*/
 	+ Campo que indica quien fue el ultimo en modificar algun recurso,sitio,etc.
 
 **/
+
+/*
+INSERT INTO TipoRecurso(nombre,fechaCreacion) VALUES ('Natural',CONVERT(NVARCHAR(10),GETDATE(),103))
+INSERT INTO TipoRecurso(nombre,fechaCreacion) VALUES ('Etnografico',CONVERT(NVARCHAR(10),GETDATE(),103))
+INSERT INTO TipoRecurso(nombre,fechaCreacion) VALUES ('Geologico',CONVERT(NVARCHAR(10),GETDATE(),103))
+INSERT INTO TipoRecurso(nombre,fechaCreacion) VALUES ('De paisaje',CONVERT(NVARCHAR(10),GETDATE(),103))
+INSERT INTO TipoRecurso(nombre,fechaCreacion) VALUES ('Arquitectonico',CONVERT(NVARCHAR(10),GETDATE(),103))
+INSERT INTO TipoRecurso(nombre,fechaCreacion) VALUES ('Arqueologico',CONVERT(NVARCHAR(10),GETDATE(),103))
+GO*/

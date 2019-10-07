@@ -17,11 +17,13 @@ CREATE PROC spAgregarASP @nombreInput NVARCHAR(64),@ubicacionInput NVARCHAR(256)
 				BEGIN TRANSACTION
 					INSERT INTO ASP(nombre,ubicacion,fechaCreacion,responsable,activo) VALUES (@nombreInput,@ubicacionInput,CONVERT(NVARCHAR(10),GETDATE(),103),@responsableInput,1)
 				COMMIT
+				PRINT @nombreInput+' agregado exitosamente'
 				RETURN 0
 			END TRY
 			BEGIN CATCH
 				IF @@TRANCOUNT > 0
 					ROLLBACK
+					PRINT 'Fallo la insercion de '+@nombreInput
 					RETURN -1*@@ERROR
 			END CATCH
 		ELSE
@@ -37,11 +39,13 @@ CREATE PROC spAgregarASP @nombreInput NVARCHAR(64),@ubicacionInput NVARCHAR(256)
 									ASP.responsable = @responsableInput
 								WHERE ASP.id = @idASP
 						COMMIT
+						PRINT @nombreInput+' agregado exitosamente'
 						RETURN 0
 					END TRY
 					BEGIN CATCH
 						IF @@TRANCOUNT > 0
 							ROLLBACK
+							PRINT 'Fallo la insercion de '+@nombreInput
 							RETURN -1*@@ERROR
 					END CATCH
 				ELSE
@@ -87,11 +91,13 @@ CREATE PROC spAgregarSitio
 								INSERT INTO Sitios(idASP,nombre,ubicacion,zonificacion,idTipoFigura,tamano,capacidad,observacionesDisenoInfraestructura,valoracionRelacionPropositoASP,valoracionRelacionTemasInterpretativos,valoracionVariedadRecurso,valoracionAtractivo,valoracionAccesibilidad,fechaCreacion,responsable,activo)
 								VALUES (@idASP,@nombreSitioInput,@ubicacionInput,@zonificacionInput,@idTipoFigura,@tamanoInput,@capacidadInput,@observacionesDisenoInfraestructuraInput,0,0,0,0,0,CONVERT(VARCHAR(10),GETDATE(),103),@responsableInput,1)
 							COMMIT
+							PRINT @nombreSitioInput + ' agregado exitosamente'
 							RETURN 0
 						END TRY
 						BEGIN CATCH
 							IF @@TRANCOUNT > 0
 								ROLLBACK
+								PRINT 'Fallo la insercion de '+@nombreSitioInput
 								RETURN -1*@@ERROR
 						END CATCH
 					END
@@ -108,11 +114,13 @@ CREATE PROC spAgregarSitio
 											Sitios.responsable = @responsableInput
 										WHERE Sitios.id = @idSitio
 								COMMIT
+								PRINT @nombreSitioInput + ' agregado exitosamente'
 								RETURN 0
 							END TRY
 							BEGIN CATCH
 								IF @@TRANCOUNT > 0
 									ROLLBACK
+									PRINT 'Fallo la insercion de '+@nombreSitioInput
 									RETURN -1*@@ERROR
 							END CATCH
 					ELSE
@@ -192,16 +200,18 @@ BEGIN
 								VALUES (@idTipoRecurso,@idSitio,@nombreRecursoInput,@ubicacionInput,@anomaliaInput,@traslapeInput,@condicionInput,@atractivosInput,@soportaUsoInput,@capacidadInput,@hectareasInput,@oportunidadesUsoInput,@responsableInput,CONVERT(NVARCHAR(15),GETDATE(),103),1)
 								
 								INSERT INTO RatingRecurso(idRecurso,relacionPropositoASP,relacionTemaInterpretativoASP,variedadRecurso,atractivo,accesibilidad,fechaModificacion,responsable)
-								SELECT SCOPE_IDENTITY() as idRecurso,@rRelacionPropositoASP,@rRelacionTemaInterpretativoASP,@rVariedadRecurso,@rAtractivo,@rAccesibildad,CONVERT(NVARCHAR(15),GETDATE(),103),@responsableInput FROM Recursos
-									
+								SELECT IDENT_CURRENT('Recursos') AS idRecurso,@rRelacionPropositoASP,@rRelacionTemaInterpretativoASP,@rVariedadRecurso,@rAtractivo,@rAccesibildad,CONVERT(NVARCHAR(15),GETDATE(),103),@responsableInput
+								
 								EXEC spActualizarValoracion @nombreASPInput, @nombreSitioInput
 									
 							COMMIT
+							PRINT @nombreRecursoInput + ' agregado exitosamente'
 							RETURN 0
 						END TRY
 						BEGIN CATCH
 							IF @@TRANCOUNT > 0
 							ROLLBACK
+							PRINT 'Fallo la insercion de '+@nombreRecursoInput
 							RETURN -1*@@ERROR
 						END CATCH
 					ELSE
@@ -219,11 +229,13 @@ BEGIN
 												WHERE Recursos.id = @idRecurso
 										
 									COMMIT
+									PRINT @nombreRecursoInput + ' agregado exitosamente'
 									RETURN 0
 								END TRY
 								BEGIN CATCH
 									IF @@TRANCOUNT > 0
 										ROLLBACK
+										PRINT 'Fallo la insercion de '+@nombreRecursoInput
 										RETURN -1*@@ERROR
 								END CATCH
 							ELSE
@@ -318,11 +330,13 @@ BEGIN
 									INSERT INTO Oportunidades(idSitio,descripcion,observaciones,fechaModificacion,responsable,activo)
 									VALUES (@idSitio,@descripcionInput,@observacionesInput,CONVERT(NVARCHAR(15),GETDATE(),103),@responsableInput,1)
 								COMMIT
+								PRINT 'Oportunidad con descripcion: '+ @descripcionInput + ' agregado exitosamente'
 								RETURN 0
 							END TRY
 							BEGIN CATCH
 								IF @@TRANCOUNT > 0
 									ROLLBACK
+									PRINT 'Fallo la insercion de la oportunidad ' + @descripcionInput
 									RETURN -1*@@ERROR
 							END CATCH
 						END
@@ -341,11 +355,13 @@ BEGIN
 											Oportunidades.fechaModificacion = CONVERT(NVARCHAR(15),GETDATE(),103),
 											Oportunidades.responsable = @responsableInput
 									COMMIT
+									PRINT 'Oportunidad con descripcion: '+ @descripcionInput + ' agregado exitosamente'
 									RETURN 0
 								END TRY
 								BEGIN CATCH
 									IF @@TRANCOUNT > 0
 										ROLLBACK
+										PRINT 'Fallo la insercion de la oportunidad ' + @descripcionInput
 										RETURN -1*@@ERROR
 								END CATCH
 							ELSE

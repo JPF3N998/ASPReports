@@ -1,5 +1,5 @@
 USE [ASPReports]
-
+SET NOCOUNT ON;
 --Insert usarios
 INSERT INTO Usuario(nombre,cedula,correo,usuario,contrasena,admin,activo) VALUES ('Administrador','123456789','admin@sinac.co.cr','admin','admin',1,1)
 INSERT INTO Usuario(nombre,cedula,correo,usuario,contrasena,admin,activo) VALUES ('Nacho','987654321','nacho@sinac.co.cr','nacho','nacho',0,1)
@@ -10,17 +10,16 @@ INSERT INTO TipoFigura(nombre) VALUES('Lineal')
 
 
 --Insert ASPs
-INSERT INTO ASP(nombre, ubicacion, fechaCreacion,responsable, activo) VALUES('Volcan Irazu', 'Cartago', CONVERT(NVARCHAR(10),GETDATE(),103),'Administrador',1)
-INSERT INTO ASP(nombre, ubicacion, fechaCreacion,responsable, activo) VALUES('Volcan Arenal', 'Alajuela', CONVERT(NVARCHAR(10),GETDATE(),103),'Administrador',1)
-INSERT INTO ASP(nombre, ubicacion, fechaCreacion,responsable, activo) VALUES('Jardin Botanico Lankester', 'Cartago', CONVERT(NVARCHAR(10),GETDATE(),103),'Administrador',1)
+
+EXEC spAgregarASP 'Volcan Irazu', 'Cartago','Administrador'
+EXEC spAgregarASP 'Volcan Arenal', 'Alajuela','Administrador'
+EXEC spAgregarASP 'Jardin Botanico Lankester', 'Cartago','Administrador'
+
 
 --Insert Sitios
-INSERT INTO Sitios(idASP, idTipoFigura, nombre,ubicacion,zonificacion,tamano,capacidad,observacionesDisenoInfraestructura,valoracionRelacionPropositoASP,valoracionRelacionTemasInterpretativos,valoracionVariedadRecurso,valoracionAtractivo,valoracionAccesibilidad,fechaCreacion,responsable,activo)
-	VALUES(1, 1, 'Crater', 'Volcan', 1,	'200m', '8 personas', 'Observaciones', 1,	1, 1, 1, 1, CONVERT(NVARCHAR(10),GETDATE(),103),'Administrador',1)
-INSERT INTO Sitios(idASP, idTipoFigura, nombre,ubicacion,zonificacion,tamano,capacidad,observacionesDisenoInfraestructura,valoracionRelacionPropositoASP,valoracionRelacionTemasInterpretativos,valoracionVariedadRecurso,valoracionAtractivo,valoracionAccesibilidad,fechaCreacion,responsable,activo)
-	VALUES(1, 1, 'Mirador', 'Volcan', 1,	'500m', '20 personas', 'Observaciones', 1,	1, 1, 1, 1, CONVERT(NVARCHAR(10),GETDATE(),103),'Administrador', 1)
-INSERT INTO Sitios(idASP, idTipoFigura, nombre,ubicacion,zonificacion,tamano,capacidad,observacionesDisenoInfraestructura,valoracionRelacionPropositoASP,valoracionRelacionTemasInterpretativos,valoracionVariedadRecurso,valoracionAtractivo,valoracionAccesibilidad,fechaCreacion,responsable,activo)
-	VALUES(1, 1, 'Camino', 'Parqueo', 1,	'200', '8 personas', 'Observaciones', 1,	1, 1, 1, 1, CONVERT(NVARCHAR(10),GETDATE(),103),'Administrador', 1)
+EXEC spAgregarSitio 'Volcan Irazu', 'Crater', 'Volcan', 1,'Poligonal',	'200m', '8 personas', 'Observaciones','Administrador'
+EXEC spAgregarSitio 'Volcan Irazu', 'Mirador', 'Volcan', 1,'Lineal',	'500m', '20 personas', 'Observaciones','Administrador'
+EXEC spAgregarSitio 'Volcan Irazu', 'Camino', 'Parqueo', 1,'Poligonal',	'200', '8 personas', 'Observaciones','Administrador'
 
 --Insert Tipo Recursos
 INSERT INTO TipoRecurso(nombre, fechaCreacion) VALUES ('Natural', CONVERT(NVARCHAR(15),GETDATE(),103))
@@ -58,7 +57,7 @@ EXEC	[dbo].[spAgregarRecurso]
 		@nombreSitioInput = N'Crater',
 		@nombreTipoRecursoInput = N'Natural',
 		@nombreRecursoInput = N'Foliles',
-		@ubicacionInput = N'Cartagp',
+		@ubicacionInput = N'Cartago',
 		@anomaliaInput = N'no se',
 		@traslapeInput = N'ni idea',
 		@condicionInput = N'ak7',
@@ -79,7 +78,7 @@ EXEC	[dbo].[spAgregarRecurso]
 		@nombreSitioInput = N'Crater',
 		@nombreTipoRecursoInput = N'Natural',
 		@nombreRecursoInput = N'Arboles anaranjados de fondo',
-		@ubicacionInput = N'Cartagp',
+		@ubicacionInput = N'Cartago',
 		@anomaliaInput = N'no se',
 		@traslapeInput = N'ni idea',
 		@condicionInput = N'ak7',
@@ -95,8 +94,8 @@ EXEC	[dbo].[spAgregarRecurso]
 		@rAccesibildad = 3,
 		@responsableInput = N'987654321'
 
+
 	--Insert Oportunidades
-INSERT INTO Oportunidades(idSitio,descripcion,observaciones,fechaModificacion,responsable,activo)
-	VALUES (3, 'Zona para crear mas camino', 'Gran variedad de arboles', CONVERT(NVARCHAR(15),GETDATE(),103),'Administrador', 1)
-INSERT INTO Oportunidades(idSitio,descripcion,observaciones,fechaModificacion,responsable,activo)
-	VALUES (1, 'Zona para crear area techado', 'Tiene vista al crater', CONVERT(NVARCHAR(15),GETDATE(),103),'Administrador', 1)
+EXEC spAgregarOportunidad 'Volcan Irazu','Camino','Zona para crear mas camino','Gran variedad de arboles','Administrador'
+EXEC spAgregarOportunidad 'Volcan Irazu','Mirador','Zona para crear area techado', 'Tiene vista al crater','Administrador'
+
