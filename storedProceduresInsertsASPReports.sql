@@ -3,6 +3,36 @@ GO
 
 SET NOCOUNT ON;
 
+--PROC para la creacion de un nuevo usuario
+DROP PROC IF EXISTS spAgregarUsuario
+GO
+
+CREATE PROC spAgregarUsuario @nombreInput NVARCHAR(50),@cedulaInput NVARCHAR(15),@correoInput NVARCHAR(50),@usernameInput NVARCHAR(50),@contrasennaInput NVARCHAR(50),@adminInput BIT
+AS
+	BEGIN
+		DECLARE @existeUsuario NVARCHAR(50) = (SELECT U.usuario FROM Usuario U WHERE @usernameInput LIKE U.usuario);
+		IF @existeUsuario IS NULL
+			BEGIN TRY
+				BEGIN TRANSACTION
+					INSERT INTO Usuario(nombre,cedula,correo,usuario,contrasena,admin,activo)
+					VALUES(@nombreInput,@cedulaInput,@correoInput,@usernameInput,@contrasennaInput,@adminInput,1);
+				COMMIT
+			END TRY
+			BEGIN CATCH
+				IF @@TRANCOUNT > 0
+						ROLLBACK
+						PRINT 'Fallo la insercion de '+@nombreInput
+						RETURN -1*@@ERROR
+			END CATCH
+		ELSE
+			BEGIN
+				PRINT 'Usuario '+@existeUsuario+' ya existe'
+				RETURN -1
+			END
+	END
+GO
+
+
 --PROC para la creacion de un ASP, si esta desactivado, se activa
 
 DROP PROC IF EXISTS spAgregarASP
@@ -50,7 +80,7 @@ CREATE PROC spAgregarASP @nombreInput NVARCHAR(64),@ubicacionInput NVARCHAR(256)
 					END CATCH
 				ELSE
 					BEGIN
-						PRINT 'Ya existe ese ASP' 
+						PRINT 'Ya existe el ASP: '+@nombreInput  
 						RETURN -1
 					END
 			END
@@ -125,7 +155,7 @@ CREATE PROC spAgregarSitio
 							END CATCH
 					ELSE
 						BEGIN
-							PRINT 'Sitio ya existe'
+							PRINT 'Sitio '+@nombreSitioInput +' ya existe'
 							RETURN -1
 						END
 					END
@@ -186,8 +216,7 @@ BEGIN
 
 					DECLARE @idRecurso INT;
 					EXEC spGetIDRecurso @idSitio,@nombreRecursoInput,@idRecurso OUTPUT;
-					
-					print @idRecurso
+				
 
 					IF @idRecurso IS NULL
 						BEGIN TRY
@@ -240,7 +269,7 @@ BEGIN
 								END CATCH
 							ELSE
 								BEGIN
-									PRINT 'Recurso ya existe'
+									PRINT 'Recurso '+@nombreRecursoInput +' ya existe'
 									RETURN -1
 								END
 						END
@@ -259,37 +288,6 @@ BEGIN
 		END
 END
 GO
-
-/*
-DECLARE	@return_value int
-
-EXEC	@return_value = [dbo].[spAgregarRecurso]
-		@nombreASPInput = N'Volcan Irazu',
-		@nombreSitioInput = N'Crater',
-		@nombreTipoRecursoInput = N'Natural',
-		@nombreRecursoInput = N'Prueba1',
-		@ubicacionInput = N'Cartagp',
-		@anomaliaInput = N'no se',
-		@traslapeInput = N'ni idea',
-		@condicionInput = N'ak7',
-		@atractivosInput = N'muchos',
-		@soportaUsoInput = 1,
-		@capacidadInput = N'5',
-		@hectareasInput = N'5000',
-		@oportunidadesUsoInput = N'muchas',
-		@rRelacionPropositoASP = 2,
-		@rRelacionTemaInterpretativoASP = 3,
-		@rVariedadRecurso = 1,
-		@rAtractivo = 2,
-		@rAccesibildad = 3,
-		@responsableInput = N'987654321'
-
-SELECT	'Return Value' = @return_value
-
-GO
-
-
-*/
 
 --PROC para agregar una oportunidad
 DROP PROC IF EXISTS spAgregarOportunidad
@@ -366,7 +364,7 @@ BEGIN
 								END CATCH
 							ELSE
 								BEGIN
-									PRINT 'Ya existe esa oportunidad'
+									PRINT 'Ya existe oportunidad con descripcion: '+ @descripcionInput
 									RETURN -1
 								END
 						END

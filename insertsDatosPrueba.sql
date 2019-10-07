@@ -1,8 +1,9 @@
 USE [ASPReports]
+GO
 SET NOCOUNT ON;
 --Insert usarios
-INSERT INTO Usuario(nombre,cedula,correo,usuario,contrasena,admin,activo) VALUES ('Administrador','123456789','admin@sinac.co.cr','admin','admin',1,1)
-INSERT INTO Usuario(nombre,cedula,correo,usuario,contrasena,admin,activo) VALUES ('Nacho','987654321','nacho@sinac.co.cr','nacho','nacho',0,1)
+EXEC spAgregarUsuario 'Administrador','123456789','admin@sinac.co.cr','admin','admin',1
+EXEC spAgregarUsuario 'Nacho','987654321','nacho@sinac.co.cr','nacho','nacho',0
 
 --Insert tipo de figura
 INSERT INTO TipoFigura(nombre) VALUES('Poligonal')
