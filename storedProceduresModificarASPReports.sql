@@ -1,6 +1,37 @@
 USE ASPReports
 GO
 
+DROP PROC IF EXISTS spModificarASP
+GO
+
+CREATE PROC spModificarrASP @nombreInput NVARCHAR(64),@ubicacionInput NVARCHAR(256),@responsableInput NVARCHAR(256) AS
+	BEGIN
+		DECLARE @idASP INT;
+		EXEC spGetIDAsp @nombreInput, @idASP OUTPUT;
+		IF @idASP IS NULL
+			BEGIN TRY
+				BEGIN TRANSACTION
+					UPDATE ASP
+						SET ASP.nombre = @nombreInput,
+							ASP.ubicacion = @ubicacionInput,
+							ASP.fechaCreacion = CONVERT(NVARCHAR(15,GETDATE(),103)),
+							ASP.responsable = @responsableInput
+							WHERE ASP.id = @idASP;
+					COMMIT
+				PRINT @nombreInput+' actualizado exitosamente'
+				RETURN 0
+			END TRY
+			BEGIN CATCH
+				IF @@TRANCOUNT > 0
+					ROLLBACK
+					PRINT 'Fallo la actualizacion de '+@nombreInput
+					RETURN -1*@@ERROR
+			END CATCH
+		ELSE
+			PRINT 'No existe el ASP ' + @nombreInput;
+			RETURN -1*@@ERROR
+	END	
+GO
 
 --PROC para modificacion de sitios
 DROP PROC IF EXISTS spModificarSitio
